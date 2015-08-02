@@ -30,6 +30,41 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
 
+  <licenses>
+    <license>
+      <name>ISC License</name>
+      <url>http://www.opensource.org/licenses/isc-license.txt</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://github.com/io7m/gtyrell</url>
+    <connection>scm:git://github.com/io7m/gtyrell</connection>
+    <developerConnection>scm:git://github.com/io7m/gtyrell</developerConnection>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>io7m</id>
+      <name>io7m</name>
+      <email>code@io7m.com</email>
+      <url>http://io7m.com</url>
+    </developer>
+  </developers>
+
+  <issueManagement>
+    <url>http://github.com/io7m/gtyrell/issues</url>
+    <system>GitHub Issues</system>
+  </issueManagement>
+
+  <distributionManagement>
+    <site>
+      <id>io7m</id>
+      <name>io7m.com</name>
+      <url>${project.url}</url>
+    </site>
+  </distributionManagement>
+
   <build>
     <plugins>
       <!-- Plugin versions -->
