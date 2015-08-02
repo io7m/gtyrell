@@ -1,0 +1,12 @@
+pre {
+  padding: 1em;
+}
+
+ul.requirements {
+  list-style-type: square;
+}
+
+ul.requirements li {
+  margin-left: 2em;
+}
+
