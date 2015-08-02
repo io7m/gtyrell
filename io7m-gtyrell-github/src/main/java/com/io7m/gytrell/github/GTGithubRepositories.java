@@ -97,7 +97,7 @@ public final class GTGithubRepositories implements GTRepositorySourceType
           "repository: {} {}", r.getName(), r.getGitTransportUrl());
 
         final GTRepositoryName name = new GTRepositoryName(r.getName());
-        final URI url = new URI(r.getGitTransportUrl());
+        final URI url = new URI(r.gitHttpTransportUrl());
         repositories.put(name, url);
       }
 
