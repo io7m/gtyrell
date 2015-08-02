@@ -47,13 +47,13 @@ public final class GTServer implements GTServerType
     LOG = LoggerFactory.getLogger(GTServer.class);
   }
 
-  private final File                         directory;
+  private final File directory;
   private final List<GTRepositorySourceType> producers;
-  private final GTGitExecutableType          git;
-  private final AtomicBoolean                done;
-  private final Duration                     pause_duration;
-  private final Timer                        timer;
-  private final AtomicBoolean                started;
+  private final GTGitExecutableType git;
+  private final AtomicBoolean done;
+  private final Duration pause_duration;
+  private final Timer timer;
+  private final AtomicBoolean started;
 
   private GTServer(
     final GTGitExecutableType in_git,
@@ -192,7 +192,12 @@ public final class GTServer implements GTServerType
           this.git.clone(url, repos);
         }
       } catch (final IOException e) {
-        GTServer.LOG.error("error updating repository {}/{}: ", e);
+        GTServer.LOG.error(
+          "error updating repository {}/{} @ {}: ",
+          group,
+          name,
+          url,
+          e);
       }
     }
   }
