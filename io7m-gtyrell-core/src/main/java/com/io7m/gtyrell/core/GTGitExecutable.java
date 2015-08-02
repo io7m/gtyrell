@@ -93,18 +93,24 @@ public final class GTGitExecutable implements GTGitExecutableType
   {
     NullCheck.notNull(repository);
 
-    final File output_full = repository.getCanonicalFile();
+    final File repository_dir = repository.getCanonicalFile();
+    if (repository_dir.isDirectory() == false) {
+      throw new IOException(
+        String.format(
+          "Not a directory: %s",
+          repository_dir));
+    }
 
     final List<String> args = new ArrayList<>(4);
     args.add(this.exec.toString());
     args.add("fetch");
     args.add("--progress");
     args.add("--prune");
-    args.add(output_full.toString());
-    GTGitExecutable.LOG.debug("execute {}", args);
+    GTGitExecutable.LOG.debug("execute {} in {}", args, repository_dir);
 
     final ProcessBuilder pb = new ProcessBuilder();
     pb.command(args);
+    pb.directory(repository_dir);
     pb.redirectErrorStream(true);
 
     final List<String> out_lines = new ArrayList<>(16);
