@@ -1,8 +1,6 @@
 io7m-gtyrell
 =========
 
-## What is this?
-
 `gtyrell` is a tiny server that periodically synchronizes a set of
 [Git](http://git-scm.com) repositories.
 
@@ -22,7 +20,7 @@ $ mvn clean package
 Compilation produces a jar file containing all of the dependencies.
 
 ```
-$ java -jar target/io7m-gtyrell-server-*-main.jar
+$ java -jar io7m-gtyrell-server/target/io7m-gtyrell-server-*-main.jar
 usage: server.conf [logback.xml]
 ```
 
