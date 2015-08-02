@@ -23,7 +23,7 @@ under the License.
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>io7m-gtyrell - 
-    gtyrell</title>
+    Releases</title>
     <link rel="stylesheet" type="text/css" href="./css/reset.css"/>
     <link rel="stylesheet" type="text/css" href="./css/plain.css"/>
     <link rel="stylesheet" type="text/css" href="./css/site.css"/>
@@ -62,11 +62,11 @@ under the License.
                                 <h5>Project</h5>
                   <ul>
                   <li class="none">
-            <strong>Overview</strong>
-          </li>
-                  <li class="none">
-                          <a href="releases.html" title="Releases">Releases</a>
+                          <a href="index.html" title="Overview">Overview</a>
             </li>
+                  <li class="none">
+            <strong>Releases</strong>
+          </li>
                   <li class="none">
                           <a href="releases.html#Documentation" title="Documentation">Documentation</a>
             </li>
@@ -117,95 +117,32 @@ under the License.
     <div id="bodyColumn">
       <div id="contentBox">
         
-
   
     <div class="section">
-<h3>gytrell<a name="gytrell"></a></h3>
-      <var>gtyrell</var> is a tiny server that periodically synchronizes a set of
-      <a class="externalLink" href="http://git-scm.com">Git</a> repositories.
+<h2>Releases<a name="Releases"></a></h2>
+      
+<p>The current release is 0.1.0.</p>
+      
+<p>
+        Source code and binaries are available from the <var>io7m</var>
+        <a class="externalLink" href="http://mvn-repository.io7m.com//com/io7m/gtyrell/">repository</a>.
+      </p>
+      
+<p>
+        When the project reaches version <var>1.0.0</var>, this and all subsequent
+        releases are also made available on
+        <a class="externalLink" href="http://search.maven.org/#search|ga|1|io7m-gtyrell">Maven Central</a>.
+      </p>
     </div>
     
 <div class="section">
-<h3>Requirements<a name="Requirements"></a></h3>
-      
-<ul class="requirements">
-        
-<li><a class="externalLink" href="http://git-scm.com">Git</a></li>
-        
-<li>A JRE supporting Java 7 or greater.</li>
-      </ul>
-    </div>
-    
-<div class="section">
-<h3>Building<a name="Building"></a></h3>
-      
-<div>
-<pre>$ mvn clean package</pre></div>
-    </div>
-    
-<div class="section">
-<h3>Running<a name="Running"></a></h3>
+<h2>Documentation<a name="Documentation"></a></h2>
       
 <p>
-        Compilation produces a jar file containing all of the dependencies.
-      </p>
-      
-<div>
-<pre>
-$ java -jar io7m-gtyrell-server/target/io7m-gtyrell-server-0.1.0-main.jar
-usage: server.conf [logback.xml]
-      </pre></div>
-      
-<p>
-        The program accepts a configuration file and an optional
-        <a class="externalLink" href="http://logback.qos.ch">Logback</a> configuration file to control
-        logging. The default is to log everything.
-      </p>
-      
-<p>
-        The <var>gtyrell</var> configuration file is in
-        <a class="externalLink" href="https://en.wikipedia.org/wiki/.properties">Java Properties</a>
-        format:
-      </p>
-      
-<div>
-<pre>
-# The base directory to which repository directories will be written
-com.io7m.gtyrell.server.directory       = /git/com.github
-
-# The path to the Git executable
-com.io7m.gtyrell.server.git_executable  = /usr/bin/git
-
-# The time to pause between synchronization attempts
-com.io7m.gtyrell.server.pause_duration  = 0h 15m 0s
-
-# A list of repository sources
-com.io7m.gtyrell.server.repository_sources = github0
-
-# A GitHub repository source
-com.io7m.gtyrell.server.repository_source.github0.type     = github
-com.io7m.gtyrell.server.repository_source.github0.user     = someone
-com.io7m.gtyrell.server.repository_source.github0.password = enoemos123
-      </pre></div>
-      
-<p>
-        The above configuration will cause the server to authenticate to
-        the <a class="externalLink" href="https://developer.github.com/v3/">GitHub API</a> as
-        <var>someone</var> using the password <var>enoemos123</var>, and
-        retrieve a list of all of the repositories owned by the user. For
-        each repository <var>r</var>, it will then clone <var>r</var>
-        to <var>/git/com.github/someone/r.git</var> if it has not yet been
-        cloned, or fetch updates to <var>r</var> if it has. When all updates
-        have been performed, it will pause for 15 minutes before trying again.
-      </p>
-      
-<p>
-        Currently, only GitHub is supported as a repository source, and only
-        in the authenticated per-user manner specified.
+        Documentation for the 0.1.0 release is not yet available.
       </p>
     </div>
   
-
 
       </div>
     </div>
