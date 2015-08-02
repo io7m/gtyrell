@@ -14,7 +14,6 @@
 
   <packaging>jar</packaging>
   <description>Git repository mirroring tool (GitHub integration)</description>
-  <url>http://github.com/io7m/gtyrell</url>
   <name>${project.artifactId}</name>
 
   <prerequisites>
@@ -25,6 +24,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
+
+  <scm>
+    <url>http://github.com/io7m/gtyrell</url>
+    <connection>scm:git:git://github.com/io7m/gtyrell</connection>
+    <developerConnection>scm:git:git://github.com/io7m/gtyrell</developerConnection>
+  </scm>
 
   <dependencies>
     <dependency>

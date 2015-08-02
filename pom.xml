@@ -11,7 +11,7 @@
 
   <packaging>pom</packaging>
   <description>Git repository mirroring tool</description>
-  <url>http://github.com/io7m/gtyrell</url>
+  <url>http://io7m.github.io/gtyrell/</url>
   <name>${project.artifactId}</name>
 
   <modules>
@@ -28,19 +28,21 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <siteReposDirectory>/com/io7m/gtyrell</siteReposDirectory>
+    <siteDocumentationDirectory>/com/io7m/gytrell/io7m-gytrell-documentation</siteDocumentationDirectory>
   </properties>
 
   <licenses>
     <license>
       <name>ISC License</name>
-      <url>http://www.opensource.org/licenses/isc-license.txt</url>
+      <url>http://io7m.com/license/isc.txt</url>
     </license>
   </licenses>
 
   <scm>
     <url>http://github.com/io7m/gtyrell</url>
-    <connection>scm:git://github.com/io7m/gtyrell</connection>
-    <developerConnection>scm:git://github.com/io7m/gtyrell</developerConnection>
+    <connection>scm:git:git://github.com/io7m/gtyrell</connection>
+    <developerConnection>scm:git:git://github.com/io7m/gtyrell</developerConnection>
   </scm>
 
   <developers>
@@ -64,6 +66,35 @@
       <url>${project.url}</url>
     </site>
   </distributionManagement>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.3</version>
+      </plugin>
+      <plugin>
+        <groupId>com.io7m.changelog</groupId>
+        <artifactId>io7m-changelog-plugin</artifactId>
+        <version>2.1.0</version>
+        <inherited>false</inherited>
+        <configuration>
+          <file>README-CHANGES.xml</file>
+          <feedAuthorEmail>contact@io7m.com</feedAuthorEmail>
+          <feedAuthorName>io7m release robot</feedAuthorName>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <build>
     <plugins>
