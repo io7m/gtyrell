@@ -1,0 +1,4 @@
+*.iml
+.idea
+io7m-gtyrell-*/target
+target
