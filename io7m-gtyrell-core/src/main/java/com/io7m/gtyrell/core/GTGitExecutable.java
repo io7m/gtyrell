@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The default implementation of the {@link GTGitExecutableType} interface.
@@ -81,8 +80,6 @@ public final class GTGitExecutable implements GTGitExecutableType
     GTGitExecutable.LOG.debug("execute {}", args);
 
     final ProcessBuilder pb = new ProcessBuilder();
-    final Map<String, String> env = pb.environment();
-    env.clear();
     pb.command(args);
     pb.redirectErrorStream(true);
 
@@ -107,8 +104,6 @@ public final class GTGitExecutable implements GTGitExecutableType
     GTGitExecutable.LOG.debug("execute {}", args);
 
     final ProcessBuilder pb = new ProcessBuilder();
-    final Map<String, String> env = pb.environment();
-    env.clear();
     pb.command(args);
     pb.redirectErrorStream(true);
 
