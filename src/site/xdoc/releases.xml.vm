@@ -11,7 +11,7 @@
       <p>The current release is ${project.version}.</p>
       <p>
         Source code and binaries are available from the <var>io7m</var>
-        <a href="http://mvn-repository.io7m.com/${siteReposDirectory}/">repository</a>.
+        <a href="https://repo1.maven.org/maven2/${siteReposDirectory}/">repository</a>.
       </p>
       <p>
         When the project reaches version <var>1.0.0</var>, this and all subsequent
