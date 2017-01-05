@@ -28,8 +28,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <siteReposDirectory>/com/io7m/gtyrell</siteReposDirectory>
-    <siteDocumentationDirectory>/com/io7m/gytrell/io7m-gytrell-documentation</siteDocumentationDirectory>
+    <siteReposDirectory>com/io7m/gtyrell</siteReposDirectory>
+    <siteDocumentationDirectory>com/io7m/gytrell/io7m-gytrell-documentation</siteDocumentationDirectory>
   </properties>
 
   <licenses>
