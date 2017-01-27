@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,4 +14,31 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-@com.io7m.jnull.NonNullByDefault package com.io7m.gytrell.github;
+package com.io7m.gtyrell.core;
+
+import com.io7m.jnull.NullCheck;
+import com.io7m.junreachable.UnreachableCodeException;
+
+import java.util.regex.Pattern;
+
+/**
+ * Functions over repository group names.
+ */
+
+public final class GTRepositoryGroupNames
+{
+  /**
+   * The pattern that defines a valid repository group name.
+   */
+
+  public static final Pattern PATTERN =
+    NullCheck.notNull(
+      Pattern.compile(
+        "[\\p{Alnum}_\\-][\\p{Alnum}_\\-\\.]{0,127}",
+        Pattern.UNICODE_CHARACTER_CLASS));
+
+  private GTRepositoryGroupNames()
+  {
+    throw new UnreachableCodeException();
+  }
+}

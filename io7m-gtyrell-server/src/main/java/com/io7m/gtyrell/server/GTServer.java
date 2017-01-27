@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -22,15 +22,14 @@ import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.jnull.NullCheck;
-import org.joda.time.Duration;
+import javaslang.collection.List;
+import javaslang.collection.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,24 +46,15 @@ public final class GTServer implements GTServerType
     LOG = LoggerFactory.getLogger(GTServer.class);
   }
 
-  private final File directory;
-  private final List<GTRepositorySourceType> producers;
-  private final GTGitExecutableType git;
   private final AtomicBoolean done;
-  private final Duration pause_duration;
   private final Timer timer;
   private final AtomicBoolean started;
+  private final GTServerConfiguration config;
 
   private GTServer(
-    final GTGitExecutableType in_git,
-    final File in_directory,
-    final List<GTRepositorySourceType> in_producers,
-    final Duration in_pause_duration)
+    final GTServerConfiguration in_config)
   {
-    this.git = NullCheck.notNull(in_git);
-    this.directory = NullCheck.notNull(in_directory);
-    this.producers = NullCheck.notNull(in_producers);
-    this.pause_duration = NullCheck.notNull(in_pause_duration);
+    this.config = NullCheck.notNull(in_config, "Config");
     this.done = new AtomicBoolean(false);
     this.started = new AtomicBoolean(false);
     this.timer = new Timer();
@@ -83,11 +73,7 @@ public final class GTServer implements GTServerType
   {
     NullCheck.notNull(config);
 
-    return new GTServer(
-      config.getGit(),
-      config.getDirectory(),
-      config.getProducers(),
-      config.getPauseDuration());
+    return new GTServer(config);
   }
 
   private static File makeRepositoryName(
@@ -96,18 +82,20 @@ public final class GTServer implements GTServerType
     final GTRepositoryName name)
   {
     return new File(
-      new File(directory, group.toString()), name.toString() + ".git");
+      new File(directory, group.text()), name.text() + ".git");
   }
 
-  @Override public void stop()
+  @Override
+  public void stop()
   {
     if (this.done.compareAndSet(false, true)) {
-      GTServer.LOG.debug("scheduling server shutdown");
+      LOG.debug("scheduling server shutdown");
       this.timer.cancel();
     }
   }
 
-  @Override public void run()
+  @Override
+  public void run()
   {
     if (this.started.compareAndSet(false, true)) {
       if (this.done.get()) {
@@ -115,16 +103,17 @@ public final class GTServer implements GTServerType
           "server has been stopped, create a new server!");
       }
 
-      GTServer.LOG.debug("starting server");
+      LOG.debug("starting server");
 
       this.timer.scheduleAtFixedRate(
         new TimerTask()
         {
-          @Override public void run()
+          @Override
+          public void run()
           {
             GTServer.this.runOnce();
           }
-        }, 0L, this.pause_duration.getMillis());
+        }, 0L, this.config.pauseDuration().toMillis());
     } else {
       throw new IllegalStateException("Server is already running!");
     }
@@ -132,72 +121,70 @@ public final class GTServer implements GTServerType
 
   void runOnce()
   {
-    GTServer.LOG.debug("running sync");
+    LOG.debug("running sync");
 
-    for (int index = 0; index < this.producers.size(); ++index) {
+    final List<GTRepositorySourceType> producers =
+      this.config.producers();
+    for (int index = 0; index < producers.size(); ++index) {
       if (this.done.get()) {
-        GTServer.LOG.debug("stopping server");
+        LOG.debug("stopping server");
         return;
       }
 
       final GTRepositorySourceType p =
-        NullCheck.notNull(this.producers.get(index));
+        NullCheck.notNull(producers.get(index));
 
-      GTServer.LOG.debug("retrieving repository group");
-
+      LOG.debug("retrieving repository group");
       final GTRepositoryGroupType g;
       try {
-        g = p.getRepositoryGroup();
+        g = p.get();
       } catch (final IOException e) {
-        GTServer.LOG.error("error syncing group: ", e);
+        LOG.error("error syncing group: ", e);
         continue;
       }
 
       this.syncGroup(g);
     }
 
-    GTServer.LOG.debug("sync completed, pausing");
+    LOG.debug("sync completed, pausing");
   }
 
   private void syncGroup(final GTRepositoryGroupType g)
   {
-    final GTRepositoryGroupName group = g.getGroupName();
-    GTServer.LOG.debug("syncing repository group: {}", group);
+    final GTRepositoryGroupName group = g.groupName();
+    LOG.debug("syncing repository group: {}", group.text());
 
-    final Map<GTRepositoryName, URI> repositories = g.getRepositories();
+    final Map<GTRepositoryName, URI> repositories = g.repositoryURIs();
+    final GTGitExecutableType git = this.config.git();
+
     for (final GTRepositoryName name : repositories.keySet()) {
       if (this.done.get()) {
-        GTServer.LOG.debug("stopping server");
+        LOG.debug("stopping server");
         return;
       }
 
-      final URI url = NullCheck.notNull(repositories.get(name));
-      GTServer.LOG.debug("syncing {}/{}: {}", group, name, url);
+      final URI url = NullCheck.notNull(repositories.get(name).get());
+      LOG.debug("syncing {}/{}: {}", group.text(), name.text(), url);
 
       try {
         final File repos =
-          GTServer.makeRepositoryName(this.directory, group, name);
+          makeRepositoryName(this.config.directory(), group, name);
         if (repos.isDirectory()) {
-          this.git.fetch(repos);
+          git.fetch(repos);
         } else {
           final File parent = repos.getParentFile();
           if (parent.mkdirs() == false) {
             if (parent.isDirectory() == false) {
               throw new IOException(
-                String.format(
-                  "Not a directory: %s", parent));
+                String.format("Not a directory: %s", parent));
             }
           }
-
-          this.git.clone(url, repos);
+          git.clone(url, repos);
         }
       } catch (final IOException e) {
-        GTServer.LOG.error(
+        LOG.error(
           "error updating repository {}/{} @ {}: ",
-          group,
-          name,
-          url,
-          e);
+          group.text(), name.text(), url, e);
       }
     }
   }

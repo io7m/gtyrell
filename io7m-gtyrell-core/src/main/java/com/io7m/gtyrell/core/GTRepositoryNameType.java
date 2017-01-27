@@ -16,30 +16,44 @@
 
 package com.io7m.gtyrell.core;
 
-import javaslang.collection.Map;
 import org.immutables.value.Value;
 
-import java.net.URI;
+import java.util.regex.Matcher;
 
 /**
- * The type of repository groups.
+ * The type of repository names.
  */
 
-@Value.Immutable
 @GTImmutableStyleType
-public interface GTRepositoryGroupType
+@Value.Immutable
+public interface GTRepositoryNameType
 {
   /**
-   * @return The name of the repository group.
+   * @return The name
    */
 
   @Value.Parameter
-  GTRepositoryGroupName groupName();
+  String text();
 
   /**
-   * @return The repositories in the group, by name.
+   * Check preconditions for the type.
    */
 
-  @Value.Parameter
-  Map<GTRepositoryName, URI> repositoryURIs();
+  @Value.Check
+  default void checkPreconditions()
+  {
+    final Matcher matcher = GTRepositoryNames.PATTERN.matcher(this.text());
+    if (!matcher.matches()) {
+      final StringBuilder sb = new StringBuilder(128);
+      sb.append("Invalid repository name.");
+      sb.append(System.lineSeparator());
+      sb.append("  Expected: ");
+      sb.append(GTRepositoryNames.PATTERN.pattern());
+      sb.append(System.lineSeparator());
+      sb.append("  Received: ");
+      sb.append(this.text());
+      sb.append(System.lineSeparator());
+      throw new IllegalArgumentException(sb.toString());
+    }
+  }
 }

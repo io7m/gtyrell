@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -60,7 +60,8 @@ public final class GTGitExecutable implements GTGitExecutableType
     return new GTGitExecutable(exec);
   }
 
-  @Override public void clone(
+  @Override
+  public void clone(
     final URI url,
     final File output)
     throws IOException
@@ -77,18 +78,18 @@ public final class GTGitExecutable implements GTGitExecutableType
     args.add("--mirror");
     args.add(url.toString());
     args.add(output_full.toString());
-    GTGitExecutable.LOG.debug("execute {}", args);
+    LOG.debug("execute {}", args);
 
     final ProcessBuilder pb = new ProcessBuilder();
     pb.command(args);
     pb.redirectErrorStream(true);
 
     final List<String> out_lines = new ArrayList<>(16);
-    GTProcessUtilities.executeLogged(
-      GTGitExecutable.LOG, pb.start(), out_lines);
+    GTProcessUtilities.executeLogged(LOG, pb.start(), out_lines);
   }
 
-  @Override public void fetch(final File repository)
+  @Override
+  public void fetch(final File repository)
     throws IOException
   {
     NullCheck.notNull(repository);
@@ -106,7 +107,7 @@ public final class GTGitExecutable implements GTGitExecutableType
     args.add("fetch");
     args.add("--progress");
     args.add("--prune");
-    GTGitExecutable.LOG.debug("execute {} in {}", args, repository_dir);
+    LOG.debug("execute {} in {}", args, repository_dir);
 
     final ProcessBuilder pb = new ProcessBuilder();
     pb.command(args);
@@ -114,7 +115,6 @@ public final class GTGitExecutable implements GTGitExecutableType
     pb.redirectErrorStream(true);
 
     final List<String> out_lines = new ArrayList<>(16);
-    GTProcessUtilities.executeLogged(
-      GTGitExecutable.LOG, pb.start(), out_lines);
+    GTProcessUtilities.executeLogged(LOG, pb.start(), out_lines);
   }
 }

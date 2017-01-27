@@ -1,5 +1,5 @@
 /*
- * Copyright © 2015 <code@io7m.com> http://io7m.com
+ * Copyright © 2017 <code@io7m.com> http://io7m.com
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 final class GTProcessUtilities
@@ -65,9 +66,10 @@ final class GTProcessUtilities
 
       if (p.exitValue() > 0) {
         try (final ByteArrayOutputStream bao = new ByteArrayOutputStream()) {
-          IOUtils.writeLines(out_lines, "\n", bao);
-          throw new IOException(
-            new String(bao.toByteArray(), "UTF-8"));
+          IOUtils.writeLines(out_lines, "\n", bao, StandardCharsets.UTF_8);
+          throw new IOException(new String(
+            bao.toByteArray(),
+            StandardCharsets.UTF_8));
         }
       }
     }

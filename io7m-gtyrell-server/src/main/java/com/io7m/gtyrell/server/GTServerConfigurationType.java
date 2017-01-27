@@ -14,32 +14,51 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.gtyrell.core;
+package com.io7m.gtyrell.server;
 
-import javaslang.collection.Map;
+import com.io7m.gtyrell.core.GTGitExecutableType;
+import com.io7m.gtyrell.core.GTImmutableStyleType;
+import com.io7m.gtyrell.core.GTRepositorySourceType;
+import javaslang.collection.List;
 import org.immutables.value.Value;
 
-import java.net.URI;
+import java.io.File;
+import java.time.Duration;
 
 /**
- * The type of repository groups.
+ * Configuration values for the server.
  */
 
 @Value.Immutable
 @GTImmutableStyleType
-public interface GTRepositoryGroupType
+public interface GTServerConfigurationType
 {
   /**
-   * @return The name of the repository group.
+   * @return The root directory inside which new directories will be created
    */
 
   @Value.Parameter
-  GTRepositoryGroupName groupName();
+  File directory();
 
   /**
-   * @return The repositories in the group, by name.
+   * @return The list of repository group producers
    */
 
   @Value.Parameter
-  Map<GTRepositoryName, URI> repositoryURIs();
+  List<GTRepositorySourceType> producers();
+
+  /**
+   * @return The git executable
+   */
+
+  @Value.Parameter
+  GTGitExecutableType git();
+
+  /**
+   * @return The duration of time that the server will pause between
+   * synchronization attempts
+   */
+
+  @Value.Parameter
+  Duration pauseDuration();
 }

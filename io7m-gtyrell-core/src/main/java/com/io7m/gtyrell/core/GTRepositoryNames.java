@@ -14,5 +14,30 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-@com.io7m.jnull.NonNullByDefault
 package com.io7m.gtyrell.core;
+
+import com.io7m.jnull.NullCheck;
+import com.io7m.junreachable.UnreachableCodeException;
+
+import java.util.regex.Pattern;
+
+/**
+ * Functions over repository names.
+ */
+
+public final class GTRepositoryNames
+{
+  /**
+   * The pattern that defines a valid repository name.
+   */
+
+  public static final Pattern PATTERN =
+    NullCheck.notNull(Pattern.compile(
+      "[\\p{Alnum}_\\-][\\p{Alnum}_\\-\\.]{0,127}",
+      Pattern.UNICODE_CHARACTER_CLASS));
+
+  private GTRepositoryNames()
+  {
+    throw new UnreachableCodeException();
+  }
+}
