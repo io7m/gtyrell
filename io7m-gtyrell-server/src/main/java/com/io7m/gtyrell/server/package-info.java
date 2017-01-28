@@ -14,4 +14,5 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-@com.io7m.jnull.NonNullByDefault package com.io7m.gtyrell.server;
+@com.io7m.jnull.NonNullByDefault
+package com.io7m.gtyrell.server;

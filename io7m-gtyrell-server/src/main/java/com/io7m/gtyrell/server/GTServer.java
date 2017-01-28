@@ -16,11 +16,11 @@
 
 package com.io7m.gtyrell.server;
 
-import com.io7m.gtyrell.core.GTGitExecutableType;
 import com.io7m.gtyrell.core.GTRepositoryGroupName;
 import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
+import com.io7m.gtyrell.core.GTRepositoryType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.List;
 import javaslang.collection.Map;
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -104,6 +103,7 @@ public final class GTServer implements GTServerType
       }
 
       LOG.debug("starting server");
+      LOG.info("{} start", this.version());
 
       this.timer.scheduleAtFixedRate(
         new TimerTask()
@@ -119,7 +119,17 @@ public final class GTServer implements GTServerType
     }
   }
 
-  void runOnce()
+  private String version()
+  {
+    final Package p = this.getClass().getPackage();
+    final String v = p.getImplementationVersion();
+    if (v != null) {
+      return "gtyrell " + v;
+    }
+    return "gtyrell";
+  }
+
+  private void runOnce()
   {
     LOG.debug("running sync");
 
@@ -137,7 +147,7 @@ public final class GTServer implements GTServerType
       LOG.debug("retrieving repository group");
       final GTRepositoryGroupType g;
       try {
-        g = p.get();
+        g = p.get(this.config.git());
       } catch (final IOException e) {
         LOG.error("error syncing group: ", e);
         continue;
@@ -154,37 +164,23 @@ public final class GTServer implements GTServerType
     final GTRepositoryGroupName group = g.groupName();
     LOG.debug("syncing repository group: {}", group.text());
 
-    final Map<GTRepositoryName, URI> repositories = g.repositoryURIs();
-    final GTGitExecutableType git = this.config.git();
-
+    final Map<GTRepositoryName, GTRepositoryType> repositories = g.repositories();
     for (final GTRepositoryName name : repositories.keySet()) {
       if (this.done.get()) {
         LOG.debug("stopping server");
         return;
       }
 
-      final URI url = NullCheck.notNull(repositories.get(name).get());
-      LOG.debug("syncing {}/{}: {}", group.text(), name.text(), url);
+      final GTRepositoryType repos =
+        NullCheck.notNull(repositories.get(name).get());
 
+      LOG.debug("syncing {}", repos);
       try {
-        final File repos =
+        final File output =
           makeRepositoryName(this.config.directory(), group, name);
-        if (repos.isDirectory()) {
-          git.fetch(repos);
-        } else {
-          final File parent = repos.getParentFile();
-          if (parent.mkdirs() == false) {
-            if (parent.isDirectory() == false) {
-              throw new IOException(
-                String.format("Not a directory: %s", parent));
-            }
-          }
-          git.clone(url, repos);
-        }
+        repos.update(output);
       } catch (final IOException e) {
-        LOG.error(
-          "error updating repository {}/{} @ {}: ",
-          group.text(), name.text(), url, e);
+        LOG.error("error syncing {}: ", repos, e);
       }
     }
   }
