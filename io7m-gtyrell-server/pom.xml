@@ -61,6 +61,10 @@
       <artifactId>javaslang</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.immutables</groupId>
       <artifactId>value</artifactId>
       <scope>provided</scope>
@@ -130,6 +134,18 @@
                 </filter>
                 <filter>
                   <artifact>ch.qos.logback:logback-classic:*</artifact>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>ch.qos.logback:logback-core:*</artifact>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>javax.mail:mail:*</artifact>
                   <includes>
                     <include>**</include>
                   </includes>
