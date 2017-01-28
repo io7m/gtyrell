@@ -115,8 +115,8 @@ final class GTGithubRepository implements GTRepositoryType
       this.git.fetch(output);
     } else {
       final File parent = output.getParentFile();
-      if (parent.mkdirs() == false) {
-        if (parent.isDirectory() == false) {
+      if (!parent.mkdirs()) {
+        if (!parent.isDirectory()) {
           throw new IOException(String.format("Not a directory: %s", parent));
         }
       }

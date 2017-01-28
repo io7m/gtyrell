@@ -69,14 +69,13 @@ public final class GTGitExecutable implements GTGitExecutableType
     NullCheck.notNull(url);
     NullCheck.notNull(output);
 
-    final File output_full = output.getCanonicalFile();
-
     final List<String> args = new ArrayList<>(4);
     args.add(this.exec.toString());
     args.add("clone");
     args.add("--progress");
     args.add("--mirror");
     args.add(url.toString());
+    final File output_full = output.getCanonicalFile();
     args.add(output_full.toString());
     LOG.debug("execute {}", args);
 
@@ -95,7 +94,7 @@ public final class GTGitExecutable implements GTGitExecutableType
     NullCheck.notNull(repository);
 
     final File repository_dir = repository.getCanonicalFile();
-    if (repository_dir.isDirectory() == false) {
+    if (!repository_dir.isDirectory()) {
       throw new IOException(
         String.format(
           "Not a directory: %s",
