@@ -25,11 +25,14 @@ import java.io.IOException;
 public interface GTRepositorySourceType
 {
   /**
+   * @param in_git A git executable
+   *
    * @return A repository group
    *
    * @throws IOException On I/O errors
    */
 
-  GTRepositoryGroupType get()
+  GTRepositoryGroupType get(
+    GTGitExecutableType in_git)
     throws IOException;
 }

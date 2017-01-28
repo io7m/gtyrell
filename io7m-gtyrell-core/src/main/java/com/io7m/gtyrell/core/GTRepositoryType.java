@@ -16,28 +16,23 @@
 
 package com.io7m.gtyrell.core;
 
-import javaslang.collection.Map;
-import org.immutables.value.Value;
+import java.io.File;
+import java.io.IOException;
 
 /**
- * The type of repository groups.
+ * The interface exposed by repositories.
  */
 
-@Value.Immutable
-@GTImmutableStyleType
-public interface GTRepositoryGroupType
+public interface GTRepositoryType
 {
   /**
-   * @return The name of the repository group.
+   * Update or clone the repository.
+   *
+   * @param directory The path to the repository clone
+   *
+   * @throws IOException On I/O errors
    */
 
-  @Value.Parameter
-  GTRepositoryGroupName groupName();
-
-  /**
-   * @return The repositories in the group, by name.
-   */
-
-  @Value.Parameter
-  Map<GTRepositoryName, GTRepositoryType> repositories();
+  void update(File directory)
+    throws IOException;
 }

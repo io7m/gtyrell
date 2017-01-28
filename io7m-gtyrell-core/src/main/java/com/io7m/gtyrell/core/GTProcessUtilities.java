@@ -43,8 +43,7 @@ final class GTProcessUtilities
   {
     try (final InputStream p_stdout = p.getInputStream()) {
       try (final BufferedReader r_stdout = new BufferedReader(
-        new InputStreamReader(
-          p_stdout))) {
+        new InputStreamReader(p_stdout, StandardCharsets.UTF_8))) {
 
         while (true) {
           final String out_line = r_stdout.readLine();

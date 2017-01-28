@@ -51,7 +51,7 @@ final class GitHubTest
     final PagedIterator<GHRepository> rsi = rs.iterator();
     while (rsi.hasNext()) {
       final GHRepository r = rsi.next();
-      GitHubTest.LOG.debug(
+      LOG.debug(
         "repository: {} {}", r.getName(), r.getGitTransportUrl());
     }
   }

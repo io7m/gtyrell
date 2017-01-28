@@ -16,11 +16,13 @@
 
 package com.io7m.gtyrell.github;
 
+import com.io7m.gtyrell.core.GTGitExecutableType;
 import com.io7m.gtyrell.core.GTRepositoryGroup;
 import com.io7m.gtyrell.core.GTRepositoryGroupName;
 import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
+import com.io7m.gtyrell.core.GTRepositoryType;
 import com.io7m.jnull.NullCheck;
 import javaslang.collection.HashMap;
 import javaslang.collection.Map;
@@ -52,14 +54,18 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   }
 
   private final Properties props;
+  private final String username;
+  private final String password;
 
   private GTGithubRepositories(
-    final String username,
-    final String password)
+    final String in_username,
+    final String in_password)
   {
+    this.username = NullCheck.notNull(in_username);
+    this.password = NullCheck.notNull(in_password);
     this.props = new Properties();
-    this.props.setProperty("login", NullCheck.notNull(username));
-    this.props.setProperty("password", NullCheck.notNull(password));
+    this.props.setProperty("login", this.username);
+    this.props.setProperty("password", this.password);
   }
 
   /**
@@ -79,29 +85,43 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   }
 
   @Override
-  public GTRepositoryGroupType get()
+  public GTRepositoryGroupType get(
+    final GTGitExecutableType in_git)
     throws IOException
   {
+    NullCheck.notNull(in_git, "Git");
+
     try {
       final GitHubBuilder ghb = GitHubBuilder.fromProperties(this.props);
       final GitHub gh = ghb.build();
       final GHMyself me = gh.getMyself();
       final String user = NullCheck.notNull(me.getLogin());
+      final GTRepositoryGroupName group = GTRepositoryGroupName.of(user);
 
-      Map<GTRepositoryName, URI> repositories = HashMap.empty();
+      Map<GTRepositoryName, GTRepositoryType> repositories = HashMap.empty();
       final PagedIterable<GHRepository> rs =
         me.listRepositories(100, GHMyself.RepositoryListFilter.OWNER);
       final PagedIterator<GHRepository> rsi = rs.iterator();
       while (rsi.hasNext()) {
         final GHRepository r = rsi.next();
+
         LOG.debug("repository: {} {}", r.getName(), r.getGitTransportUrl());
 
         final GTRepositoryName name = GTRepositoryName.of(r.getName());
-        final URI url = new URI(r.gitHttpTransportUrl());
-        repositories = repositories.put(name, url);
+        final URI clone_url = new URI(r.gitHttpTransportUrl());
+
+        repositories = repositories.put(
+          name,
+          new GTGithubRepository(
+            in_git,
+            this.username,
+            this.password,
+            group,
+            name,
+            clone_url));
       }
 
-      return GTRepositoryGroup.of(GTRepositoryGroupName.of(user), repositories);
+      return GTRepositoryGroup.of(group, repositories);
     } catch (final URISyntaxException e) {
       throw new IOException(e);
     }

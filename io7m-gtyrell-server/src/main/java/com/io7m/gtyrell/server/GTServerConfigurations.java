@@ -30,7 +30,7 @@ import javaslang.collection.List;
 
 import java.io.File;
 import java.time.Duration;
-import java.time.format.DateTimeFormatterBuilder;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -91,7 +91,7 @@ public final class GTServerConfigurations
     final String type = JProperties.getString(
       p, type_key);
 
-    if ("github".equals(type)) {
+    if (Objects.equals("github", type)) {
       final String user_key = String.format(
         "com.io7m.gtyrell.server.repository_source.%s.user", source_name);
       final String password_key = String.format(
@@ -128,8 +128,6 @@ public final class GTServerConfigurations
   {
     final String duration_text = JProperties.getString(
       p, "com.io7m.gtyrell.server.pause_duration");
-
-    final DateTimeFormatterBuilder fmt_b = new DateTimeFormatterBuilder();
 
     final Pattern pattern = Pattern.compile("([0-9]+)h ([0-9]+)m ([0-9]+)s");
     final Matcher matcher = pattern.matcher(duration_text);
