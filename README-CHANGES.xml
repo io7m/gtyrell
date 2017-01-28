@@ -4,6 +4,17 @@
 
   <c:release c:ticket-system="com.github.io7m.gtyrell">
     <c:date>2017-01-28</c:date>
+    <c:version>0.2.1</c:version>
+    <c:item>
+      <c:date>2017-01-28</c:date>
+      <c:type-code-fix/>
+      <c:ticket>3</c:ticket>
+      <c:summary>Fix shade and dependency configuration for mail alerts.</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.github.io7m.gtyrell">
+    <c:date>2017-01-28</c:date>
     <c:version>0.2.0</c:version>
     <c:item>
       <c:date>2017-01-28</c:date>
