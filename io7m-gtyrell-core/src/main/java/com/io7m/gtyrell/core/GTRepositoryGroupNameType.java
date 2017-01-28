@@ -42,7 +42,7 @@ public interface GTRepositoryGroupNameType
   @Value.Check
   default void checkPreconditions()
   {
-    final Matcher matcher = GTRepositoryNames.PATTERN.matcher(this.text());
+    final Matcher matcher = GTRepositoryGroupNames.PATTERN.matcher(this.text());
     if (!matcher.matches()) {
       final StringBuilder sb = new StringBuilder(128);
       sb.append("Invalid repository group name.");

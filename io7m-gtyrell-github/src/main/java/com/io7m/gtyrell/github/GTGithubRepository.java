@@ -87,7 +87,6 @@ final class GTGithubRepository implements GTRepositoryType
     final HttpURLConnection conn)
     throws IOException
   {
-    final InputStream stream;
     if (Objects.equals("gzip", conn.getContentEncoding())) {
       return new GZIPInputStream(conn.getInputStream());
     }
