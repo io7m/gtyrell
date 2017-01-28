@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.io7m.gtyrell</groupId>
     <artifactId>io7m-gtyrell</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
   </parent>
   <artifactId>io7m-gtyrell-server</artifactId>
 
@@ -59,6 +59,10 @@
     <dependency>
       <groupId>io.javaslang</groupId>
       <artifactId>javaslang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
     </dependency>
     <dependency>
       <groupId>org.immutables</groupId>
@@ -130,6 +134,18 @@
                 </filter>
                 <filter>
                   <artifact>ch.qos.logback:logback-classic:*</artifact>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>ch.qos.logback:logback-core:*</artifact>
+                  <includes>
+                    <include>**</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>javax.mail:mail:*</artifact>
                   <includes>
                     <include>**</include>
                   </includes>
