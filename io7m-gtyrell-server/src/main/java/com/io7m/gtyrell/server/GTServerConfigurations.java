@@ -30,7 +30,6 @@ import javaslang.collection.List;
 
 import java.io.File;
 import java.time.Duration;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
