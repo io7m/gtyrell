@@ -89,7 +89,6 @@ final class GTGithubRepository implements GTRepositoryType
   private static final class CountedMaybeCompressedStream extends ProxyInputStream
   {
     private final CountingInputStream inner;
-    private final InputStream outer;
 
     private CountedMaybeCompressedStream(
       final CountingInputStream in_inner,
@@ -97,7 +96,6 @@ final class GTGithubRepository implements GTRepositoryType
     {
       super(in_outer);
       this.inner = NullCheck.notNull(in_inner, "Inner");
-      this.outer = NullCheck.notNull(in_outer, "Outer");
     }
 
     static CountedMaybeCompressedStream fromHTTPConnection(
