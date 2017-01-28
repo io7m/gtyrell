@@ -7,7 +7,7 @@ gtyrell
 
 ## Usage
 
-1. Create a server configuration file (`server.conf`):
+Create a server configuration file (`server.conf`):
 
 ```
 com.io7m.gtyrell.server.directory      = /tmp/gh
@@ -24,9 +24,13 @@ com.io7m.gtyrell.server.repository_source.github0.password = yourgithubpassword
 The above will attempt to sync repositories from GitHub to `/tmp/gh`
 every 15 minutes.
 
-2. Run the server:
+Run the server:
 
 ```
 $ java -jar io7m-gtyrell-server-0.2.1-main.jar server.conf
 ```
+
+The server will not fork into the background and can be safely used under
+a process supervision system such as [s6](http://www.skarnet.org/software/s6/)
+without issues.
 
