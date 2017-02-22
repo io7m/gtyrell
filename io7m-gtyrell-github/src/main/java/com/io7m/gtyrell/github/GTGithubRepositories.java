@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 
 /**
@@ -57,6 +58,7 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   private final Properties props;
   private final String username;
   private final String password;
+  private final SimpleDateFormat formatter;
 
   private GTGithubRepositories(
     final String in_username,
@@ -67,6 +69,7 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     this.props = new Properties();
     this.props.setProperty("login", this.username);
     this.props.setProperty("password", this.password);
+    this.formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ");
   }
 
   /**
@@ -95,6 +98,13 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     try {
       final GitHubBuilder ghb = GitHubBuilder.fromProperties(this.props);
       final GitHub gh = ghb.build();
+
+      LOG.debug(
+        "github api rate limit {} remaining {} reset {}",
+        Integer.valueOf(gh.getRateLimit().limit),
+        Integer.valueOf(gh.rateLimit().remaining),
+        this.formatter.format(gh.rateLimit().getResetDate()));
+
       final GHMyself me = gh.getMyself();
 
       SortedMap<GTRepositoryGroupName, SortedMap<GTRepositoryName, GTRepositoryType>> groups =
