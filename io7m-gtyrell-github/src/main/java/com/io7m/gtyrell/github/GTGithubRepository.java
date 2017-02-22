@@ -175,6 +175,7 @@ final class GTGithubRepository implements GTRepositoryType
       try (final GZIPInputStream is =
              new GZIPInputStream(Files.newInputStream(file))) {
         m.readTree(is);
+        LOG.debug("parsed issues correctly, replacing");
         return true;
       }
     } catch (final JsonProcessingException e) {
