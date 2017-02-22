@@ -29,7 +29,7 @@ every 15 minutes.
 Run the server:
 
 ```
-$ java -jar io7m-gtyrell-server-0.2.1-main.jar server.conf
+$ java -jar io7m-gtyrell-server-1.0.0-main.jar server.conf
 ```
 
 The server will not fork into the background and can be safely used under

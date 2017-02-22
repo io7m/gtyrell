@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.io7m.gtyrell</groupId>
   <artifactId>io7m-gtyrell</artifactId>
-  <version>0.3.0</version>
+  <version>1.0.0</version>
 
   <packaging>pom</packaging>
   <name>io7m-gtyrell</name>
