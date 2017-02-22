@@ -61,4 +61,15 @@ public interface GTServerConfigurationType
 
   @Value.Parameter
   Duration pauseDuration();
+
+  /**
+   * @return {@code true} iff repositories should not actually be cloned
+   */
+
+  @Value.Parameter
+  @Value.Default
+  default boolean dryRun()
+  {
+    return false;
+  }
 }

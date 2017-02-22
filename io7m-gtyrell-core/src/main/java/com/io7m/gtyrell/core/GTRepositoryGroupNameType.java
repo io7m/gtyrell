@@ -16,6 +16,7 @@
 
 package com.io7m.gtyrell.core;
 
+import com.io7m.jnull.NullCheck;
 import org.immutables.value.Value;
 
 import java.util.regex.Matcher;
@@ -27,6 +28,7 @@ import java.util.regex.Matcher;
 @GTImmutableStyleType
 @Value.Immutable
 public interface GTRepositoryGroupNameType
+  extends Comparable<GTRepositoryGroupNameType>
 {
   /**
    * @return The name
@@ -55,5 +57,12 @@ public interface GTRepositoryGroupNameType
       sb.append(System.lineSeparator());
       throw new IllegalArgumentException(sb.toString());
     }
+  }
+
+  @Override
+  default int compareTo(
+    final GTRepositoryGroupNameType o)
+  {
+    return this.text().compareTo(NullCheck.notNull(o, "Other").text());
   }
 }

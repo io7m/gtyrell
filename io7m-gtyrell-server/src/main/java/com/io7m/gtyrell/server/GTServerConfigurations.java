@@ -75,7 +75,11 @@ public final class GTServerConfigurations
       sources = sources.append(source);
     }
 
-    return GTServerConfiguration.of(root, sources, git, pause);
+    final boolean dry_run =
+      JProperties.getBooleanOptional(
+        p, "com.io7m.gtyrell.server.dry_run", false);
+
+    return GTServerConfiguration.of(root, sources, git, pause, dry_run);
   }
 
   private static GTRepositorySourceType parseSource(

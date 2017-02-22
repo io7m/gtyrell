@@ -16,7 +16,10 @@
 
 package com.io7m.gtyrell.core;
 
+import javaslang.collection.SortedMap;
+
 import java.io.IOException;
+
 
 /**
  * The type of functions that can fetch named groups of repositories.
@@ -27,12 +30,12 @@ public interface GTRepositorySourceType
   /**
    * @param in_git A git executable
    *
-   * @return A repository group
+   * @return A set of repository groups
    *
    * @throws IOException On I/O errors
    */
 
-  GTRepositoryGroupType get(
+  SortedMap<GTRepositoryGroupName, GTRepositoryGroupType> get(
     GTGitExecutableType in_git)
     throws IOException;
 }
