@@ -117,8 +117,18 @@ public final class GTGithubRepositories implements GTRepositorySourceType
           GTRepositoryGroupName.of(r.getOwnerName());
         final GTRepositoryName name =
           GTRepositoryName.of(r.getName());
-        final URI clone_url =
+        final URI base_clone_url =
           new URI(r.gitHttpTransportUrl());
+
+        final URI clone_url =
+          new URI(
+            base_clone_url.getScheme(),
+            this.username,
+            base_clone_url.getHost(),
+            base_clone_url.getPort(),
+            base_clone_url.getPath(),
+            base_clone_url.getQuery(),
+            base_clone_url.getFragment());
 
         SortedMap<GTRepositoryName, GTRepositoryType> repositories;
         if (groups.containsKey(group)) {

@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The default implementation of the {@link GTGitExecutableType} interface.
@@ -81,10 +82,18 @@ public final class GTGitExecutable implements GTGitExecutableType
 
     final ProcessBuilder pb = new ProcessBuilder();
     pb.command(args);
+    configureEnvironment(pb.environment());
     pb.redirectErrorStream(true);
 
     final List<String> out_lines = new ArrayList<>(16);
-    GTProcessUtilities.executeLogged(LOG, pb.start(), out_lines);
+    final Process process = pb.start();
+    GTProcessUtilities.executeLogged(LOG, process, out_lines);
+  }
+
+  private static void configureEnvironment(
+    final Map<String, String> environment)
+  {
+    environment.put("GIT_TERMINAL_PROMPT", "0");
   }
 
   @Override
@@ -96,9 +105,7 @@ public final class GTGitExecutable implements GTGitExecutableType
     final File repository_dir = repository.getCanonicalFile();
     if (!repository_dir.isDirectory()) {
       throw new IOException(
-        String.format(
-          "Not a directory: %s",
-          repository_dir));
+        String.format("Not a directory: %s", repository_dir));
     }
 
     final List<String> args = new ArrayList<>(4);
@@ -111,9 +118,11 @@ public final class GTGitExecutable implements GTGitExecutableType
     final ProcessBuilder pb = new ProcessBuilder();
     pb.command(args);
     pb.directory(repository_dir);
+    configureEnvironment(pb.environment());
     pb.redirectErrorStream(true);
 
     final List<String> out_lines = new ArrayList<>(16);
-    GTProcessUtilities.executeLogged(LOG, pb.start(), out_lines);
+    final Process process = pb.start();
+    GTProcessUtilities.executeLogged(LOG, process, out_lines);
   }
 }
