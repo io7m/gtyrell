@@ -16,6 +16,8 @@
 
 package com.io7m.gtyrell.github;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.io7m.gtyrell.core.GTGitExecutableType;
 import com.io7m.gtyrell.core.GTRepositoryGroupName;
 import com.io7m.gtyrell.core.GTRepositoryName;
@@ -86,34 +88,6 @@ final class GTGithubRepository implements GTRepositoryType
       StandardOpenOption.WRITE));
   }
 
-  private static final class CountedMaybeCompressedStream extends ProxyInputStream
-  {
-    private final CountingInputStream inner;
-
-    private CountedMaybeCompressedStream(
-      final CountingInputStream in_inner,
-      final InputStream in_outer)
-    {
-      super(in_outer);
-      this.inner = NullCheck.notNull(in_inner, "Inner");
-    }
-
-    static CountedMaybeCompressedStream fromHTTPConnection(
-      final HttpURLConnection conn)
-      throws IOException
-    {
-      final InputStream raw = conn.getInputStream();
-      final CountingInputStream counter = new CountingInputStream(raw);
-      final InputStream outer;
-      if (Objects.equals("gzip", conn.getContentEncoding())) {
-        outer = new GZIPInputStream(counter);
-      } else {
-        outer = counter;
-      }
-      return new CountedMaybeCompressedStream(counter, outer);
-    }
-  }
-
   @Override
   public String toString()
   {
@@ -180,10 +154,65 @@ final class GTGithubRepository implements GTRepositoryType
            CountedMaybeCompressedStream.fromHTTPConnection(conn)) {
       try (final OutputStream output = createOutput(path_tmp)) {
         IOUtils.copy(input, output);
-        LOG.debug("received {} octets",
-                  Long.toUnsignedString(input.inner.getByteCount()));
+        LOG.debug(
+          "received {} octets",
+          Long.toUnsignedString(input.inner.getByteCount()));
+        output.flush();
+      }
+
+      if (this.parseJSON(path_tmp)) {
         Files.move(path_tmp, path, StandardCopyOption.ATOMIC_MOVE);
       }
+    }
+  }
+
+  private boolean parseJSON(
+    final Path file)
+    throws IOException
+  {
+    final ObjectMapper m = new ObjectMapper();
+    try {
+      try (final GZIPInputStream is =
+             new GZIPInputStream(Files.newInputStream(file))) {
+        m.readTree(is);
+        return true;
+      }
+    } catch (final JsonProcessingException e) {
+      LOG.error(
+        "could not parse issues for {}/{}: ",
+        this.group.text(),
+        this.name.text(),
+        e);
+      return false;
+    }
+  }
+
+  private static final class CountedMaybeCompressedStream extends
+    ProxyInputStream
+  {
+    private final CountingInputStream inner;
+
+    private CountedMaybeCompressedStream(
+      final CountingInputStream in_inner,
+      final InputStream in_outer)
+    {
+      super(in_outer);
+      this.inner = NullCheck.notNull(in_inner, "Inner");
+    }
+
+    static CountedMaybeCompressedStream fromHTTPConnection(
+      final HttpURLConnection conn)
+      throws IOException
+    {
+      final InputStream raw = conn.getInputStream();
+      final CountingInputStream counter = new CountingInputStream(raw);
+      final InputStream outer;
+      if (Objects.equals("gzip", conn.getContentEncoding())) {
+        outer = new GZIPInputStream(counter);
+      } else {
+        outer = counter;
+      }
+      return new CountedMaybeCompressedStream(counter, outer);
     }
   }
 }
