@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -135,6 +137,8 @@ public final class GTServer implements GTServerType
   {
     LOG.debug("running sync");
 
+    final Instant time_then = Instant.now();
+
     final List<GTRepositorySourceType> producers =
       this.config.producers();
     for (int index = 0; index < producers.size(); ++index) {
@@ -163,7 +167,27 @@ public final class GTServer implements GTServerType
       }
     }
 
+    final Instant time_now = Instant.now();
+    LOG.debug("sync took {}", elapsedTime(time_then, time_now));
     LOG.debug("sync completed, pausing");
+  }
+
+  private static String elapsedTime(
+    final Instant time_then,
+    final Instant time_now)
+  {
+    final long elapsed = time_then.until(time_now, ChronoUnit.SECONDS);
+
+    final int seconds = Math.toIntExact(elapsed % 60L);
+    final int new_elapsed = Math.toIntExact(elapsed / 60L);
+    final int minutes = new_elapsed % 60;
+    final int hours = new_elapsed / 60;
+
+    return String.format(
+      "%sh %sm %ss",
+      Integer.valueOf(hours),
+      Integer.valueOf(minutes),
+      Integer.valueOf(seconds));
   }
 
   private void syncGroup(final GTRepositoryGroupType g)
