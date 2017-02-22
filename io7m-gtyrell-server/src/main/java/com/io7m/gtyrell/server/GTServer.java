@@ -22,13 +22,17 @@ import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.core.GTRepositoryType;
 import com.io7m.jnull.NullCheck;
+import javaslang.Tuple2;
 import javaslang.collection.List;
 import javaslang.collection.Map;
+import javaslang.collection.SortedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -133,6 +137,8 @@ public final class GTServer implements GTServerType
   {
     LOG.debug("running sync");
 
+    final Instant time_then = Instant.now();
+
     final List<GTRepositorySourceType> producers =
       this.config.producers();
     for (int index = 0; index < producers.size(); ++index) {
@@ -144,19 +150,44 @@ public final class GTServer implements GTServerType
       final GTRepositorySourceType p =
         NullCheck.notNull(producers.get(index));
 
-      LOG.debug("retrieving repository group");
-      final GTRepositoryGroupType g;
-      try {
-        g = p.get(this.config.git());
-      } catch (final IOException e) {
-        LOG.error("error syncing group: ", e);
-        continue;
-      }
+      LOG.debug("retrieving repository groups");
+      final SortedMap<GTRepositoryGroupName, GTRepositoryGroupType> groups;
 
-      this.syncGroup(g);
+      try {
+        groups = p.get(this.config.git());
+        for (final Tuple2<GTRepositoryGroupName, GTRepositoryGroupType> group : groups) {
+          try {
+            this.syncGroup(group._2);
+          } catch (final Exception e) {
+            LOG.error("error syncing group: {}: ", group._1.text(), e);
+          }
+        }
+      } catch (final Exception e) {
+        LOG.error("error retrieving repository groups: ", e);
+      }
     }
 
+    final Instant time_now = Instant.now();
+    LOG.debug("sync took {}", elapsedTime(time_then, time_now));
     LOG.debug("sync completed, pausing");
+  }
+
+  private static String elapsedTime(
+    final Instant time_then,
+    final Instant time_now)
+  {
+    final long elapsed = time_then.until(time_now, ChronoUnit.SECONDS);
+
+    final int seconds = Math.toIntExact(elapsed % 60L);
+    final int new_elapsed = Math.toIntExact(elapsed / 60L);
+    final int minutes = new_elapsed % 60;
+    final int hours = new_elapsed / 60;
+
+    return String.format(
+      "%sh %sm %ss",
+      Integer.valueOf(hours),
+      Integer.valueOf(minutes),
+      Integer.valueOf(seconds));
   }
 
   private void syncGroup(final GTRepositoryGroupType g)
@@ -178,7 +209,11 @@ public final class GTServer implements GTServerType
       try {
         final File output =
           makeRepositoryName(this.config.directory(), group, name);
-        repos.update(output);
+        if (!this.config.dryRun()) {
+          repos.update(output);
+        } else {
+          LOG.debug("not syncing due to dry run");
+        }
       } catch (final IOException e) {
         LOG.error("error syncing {}: ", repos, e);
       }

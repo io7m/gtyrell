@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.io7m.gtyrell</groupId>
     <artifactId>io7m-gtyrell</artifactId>
-    <version>0.2.1</version>
+    <version>1.0.0</version>
   </parent>
   <artifactId>io7m-gtyrell-github</artifactId>
 
@@ -60,6 +60,10 @@
       <groupId>org.immutables.javaslang</groupId>
       <artifactId>javaslang-encodings</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
 
     <dependency>

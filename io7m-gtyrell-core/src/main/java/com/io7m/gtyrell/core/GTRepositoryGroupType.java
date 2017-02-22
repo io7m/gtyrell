@@ -16,7 +16,7 @@
 
 package com.io7m.gtyrell.core;
 
-import javaslang.collection.Map;
+import javaslang.collection.SortedMap;
 import org.immutables.value.Value;
 
 /**
@@ -39,5 +39,5 @@ public interface GTRepositoryGroupType
    */
 
   @Value.Parameter
-  Map<GTRepositoryName, GTRepositoryType> repositories();
+  SortedMap<GTRepositoryName, GTRepositoryType> repositories();
 }

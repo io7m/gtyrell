@@ -3,6 +3,29 @@
   <c:project>io7m-gtyrell</c:project>
 
   <c:release c:ticket-system="com.github.io7m.gtyrell">
+    <c:date>2017-02-22</c:date>
+    <c:version>1.0.0</c:version>
+    <c:item>
+      <c:date>2017-02-22</c:date>
+      <c:type-code-fix/>
+      <c:ticket>2</c:ticket>
+      <c:summary>Mirror all repositories, not just those that the user owns.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2017-02-22</c:date>
+      <c:type-code-fix/>
+      <c:ticket>4</c:ticket>
+      <c:summary>Parse GitHub issues before saving them, and do not save invalid JSON.</c:summary>
+    </c:item>
+    <c:item>
+      <c:date>2017-02-22</c:date>
+      <c:type-code-fix/>
+      <c:ticket>5</c:ticket>
+      <c:summary>Fail quickly when the user fails to provide authentication details for repositories that require them for cloning or updating.</c:summary>
+    </c:item>
+  </c:release>
+
+  <c:release c:ticket-system="com.github.io7m.gtyrell">
     <c:date>2017-01-28</c:date>
     <c:version>0.2.1</c:version>
     <c:item>

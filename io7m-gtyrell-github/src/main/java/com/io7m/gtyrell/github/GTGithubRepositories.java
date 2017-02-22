@@ -24,8 +24,9 @@ import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.core.GTRepositoryType;
 import com.io7m.jnull.NullCheck;
-import javaslang.collection.HashMap;
-import javaslang.collection.Map;
+import javaslang.Tuple;
+import javaslang.collection.SortedMap;
+import javaslang.collection.TreeMap;
 import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.SimpleDateFormat;
 import java.util.Properties;
 
 /**
@@ -56,6 +58,7 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   private final Properties props;
   private final String username;
   private final String password;
+  private final SimpleDateFormat formatter;
 
   private GTGithubRepositories(
     final String in_username,
@@ -66,6 +69,7 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     this.props = new Properties();
     this.props.setProperty("login", this.username);
     this.props.setProperty("password", this.password);
+    this.formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ");
   }
 
   /**
@@ -85,7 +89,7 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   }
 
   @Override
-  public GTRepositoryGroupType get(
+  public SortedMap<GTRepositoryGroupName, GTRepositoryGroupType> get(
     final GTGitExecutableType in_git)
     throws IOException
   {
@@ -94,34 +98,66 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     try {
       final GitHubBuilder ghb = GitHubBuilder.fromProperties(this.props);
       final GitHub gh = ghb.build();
-      final GHMyself me = gh.getMyself();
-      final String user = NullCheck.notNull(me.getLogin());
-      final GTRepositoryGroupName group = GTRepositoryGroupName.of(user);
 
-      Map<GTRepositoryName, GTRepositoryType> repositories = HashMap.empty();
+      LOG.debug(
+        "github api rate limit {} remaining {} reset {}",
+        Integer.valueOf(gh.getRateLimit().limit),
+        Integer.valueOf(gh.rateLimit().remaining),
+        this.formatter.format(gh.rateLimit().getResetDate()));
+
+      final GHMyself me = gh.getMyself();
+
+      SortedMap<GTRepositoryGroupName, SortedMap<GTRepositoryName, GTRepositoryType>> groups =
+        TreeMap.empty();
+
       final PagedIterable<GHRepository> rs =
-        me.listRepositories(100, GHMyself.RepositoryListFilter.OWNER);
+        me.listRepositories(100, GHMyself.RepositoryListFilter.ALL);
       final PagedIterator<GHRepository> rsi = rs.iterator();
+
       while (rsi.hasNext()) {
         final GHRepository r = rsi.next();
 
-        LOG.debug("repository: {} {}", r.getName(), r.getGitTransportUrl());
+        LOG.debug(
+          "repository: {}/{} {}",
+          r.getOwnerName(),
+          r.getName(),
+          r.getGitTransportUrl());
 
-        final GTRepositoryName name = GTRepositoryName.of(r.getName());
-        final URI clone_url = new URI(r.gitHttpTransportUrl());
+        final GTRepositoryGroupName group =
+          GTRepositoryGroupName.of(r.getOwnerName());
+        final GTRepositoryName name =
+          GTRepositoryName.of(r.getName());
+        final URI base_clone_url =
+          new URI(r.gitHttpTransportUrl());
 
-        repositories = repositories.put(
-          name,
-          new GTGithubRepository(
-            in_git,
+        final URI clone_url =
+          new URI(
+            base_clone_url.getScheme(),
             this.username,
-            this.password,
-            group,
-            name,
-            clone_url));
+            base_clone_url.getHost(),
+            base_clone_url.getPort(),
+            base_clone_url.getPath(),
+            base_clone_url.getQuery(),
+            base_clone_url.getFragment());
+
+        SortedMap<GTRepositoryName, GTRepositoryType> repositories;
+        if (groups.containsKey(group)) {
+          repositories = groups.get(group).get();
+        } else {
+          repositories = TreeMap.empty();
+        }
+
+        final GTRepositoryType repository =
+          new GTGithubRepository(
+            in_git, this.username, this.password, group, name, clone_url);
+
+        repositories = repositories.put(name, repository);
+        groups = groups.put(group, repositories);
       }
 
-      return GTRepositoryGroup.of(group, repositories);
+      return groups.map(
+        (group_name, repositories) ->
+          Tuple.of(group_name, GTRepositoryGroup.of(group_name, repositories)));
     } catch (final URISyntaxException e) {
       throw new IOException(e);
     }
