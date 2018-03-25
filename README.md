@@ -29,10 +29,46 @@ every 15 minutes.
 Run the server:
 
 ```
-$ java -jar io7m-gtyrell-server-1.0.0-main.jar server.conf
+$ java -jar com.io7m.gtyrell.server-1.0.0-main.jar server.conf
 ```
 
 The server will not fork into the background and can be safely used under
 a process supervision system such as [s6](http://www.skarnet.org/software/s6/)
 without issues.
+
+## Inclusions/Exclusions
+
+It's possible to explicitly include and exclude repositories from being
+cloned and/or updated. This is achieved by specifying an inclusion
+and/or an exclusion pattern for the repository source:
+
+```
+com.io7m.gtyrell.server.repository_source.github0.type     = github
+com.io7m.gtyrell.server.repository_source.github0.user     = yourgithubusername
+com.io7m.gtyrell.server.repository_source.github0.password = yourgithubpassword
+com.io7m.gtyrell.server.repository_source.github0.include  = ^ExampleOwner/ReposA$
+com.io7m.gtyrell.server.repository_source.github0.exclude  = ^$
+```
+
+Patterns are given in [Java regular expression syntax](https://docs.oracle.com/javase/9/docs/api/java/util/regex/Pattern.html)
+and are matched against the incoming repository owner and name separated by a slash.
+The exact check performed is `includes(name) && !excludes(name)`.
+If no patterns are specified, then the patterns default to the following values:
+
+```
+com.io7m.gtyrell.server.repository_source.github0.include  = ^.*$
+com.io7m.gtyrell.server.repository_source.github0.exclude  = ^$
+```
+
+This has the effect of including every repository, and excluding none of them.
+
+```
+# Include everything but exclude io7m/gtyrell
+com.io7m.gtyrell.server.repository_source.github0.include  = ^.*$
+com.io7m.gtyrell.server.repository_source.github0.exclude  = ^io7m/gtyrell$
+
+# Include only io7m projects
+com.io7m.gtyrell.server.repository_source.github0.include  = ^io7m/.*$
+com.io7m.gtyrell.server.repository_source.github0.exclude  = ^$
+```
 

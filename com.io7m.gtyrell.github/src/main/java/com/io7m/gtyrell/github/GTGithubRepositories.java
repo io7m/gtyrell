@@ -23,7 +23,6 @@ import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.core.GTRepositoryType;
-import java.util.Objects;
 import io.vavr.Tuple;
 import io.vavr.collection.SortedMap;
 import io.vavr.collection.TreeMap;
@@ -40,7 +39,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A repository group producer that fetches the owned repositories of a single
@@ -59,13 +61,24 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   private final String username;
   private final String password;
   private final SimpleDateFormat formatter;
+  private final Pattern inclusion;
+  private final Pattern exclusion;
 
   private GTGithubRepositories(
     final String in_username,
-    final String in_password)
+    final String in_password,
+    final Pattern in_inclusion,
+    final Pattern in_exclusion)
   {
-    this.username = Objects.requireNonNull(in_username, "in_username");
-    this.password = Objects.requireNonNull(in_password, "in_password");
+    this.username =
+      Objects.requireNonNull(in_username, "in_username");
+    this.password =
+      Objects.requireNonNull(in_password, "in_password");
+    this.inclusion =
+      Objects.requireNonNull(in_inclusion, "in_inclusion");
+    this.exclusion =
+      Objects.requireNonNull(in_exclusion, "in_exclusion");
+
     this.props = new Properties();
     this.props.setProperty("login", this.username);
     this.props.setProperty("password", this.password);
@@ -75,17 +88,22 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   /**
    * Create a new repository source.
    *
-   * @param in_username The GitHub user
-   * @param in_password The user's password
+   * @param in_username  The GitHub user
+   * @param in_password  The user's password
+   * @param in_exclusion The exclusion pattern
+   * @param in_inclusion The inclusion pattern
    *
    * @return A new source
    */
 
   public static GTRepositorySourceType newSource(
     final String in_username,
-    final String in_password)
+    final String in_password,
+    final Pattern in_inclusion,
+    final Pattern in_exclusion)
   {
-    return new GTGithubRepositories(in_username, in_password);
+    return new GTGithubRepositories(
+      in_username, in_password, in_inclusion, in_exclusion);
   }
 
   @Override
@@ -122,6 +140,14 @@ public final class GTGithubRepositories implements GTRepositorySourceType
           r.getOwnerName(),
           r.getName(),
           r.getGitTransportUrl());
+
+        if (!this.repositoryIsIncluded(r.getOwnerName(), r.getName())) {
+          LOG.debug(
+            "repository {}/{} is not included",
+            r.getOwnerName(),
+            r.getName());
+          continue;
+        }
 
         final GTRepositoryGroupName group =
           GTRepositoryGroupName.of(r.getOwnerName());
@@ -161,5 +187,38 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     } catch (final URISyntaxException e) {
       throw new IOException(e);
     }
+  }
+
+  private boolean repositoryIsIncluded(
+    final String owner_name,
+    final String name)
+  {
+    final String repos_name =
+      new StringBuilder(128)
+        .append(owner_name)
+        .append("/")
+        .append(name)
+        .toString();
+
+    final Matcher inclusion_matcher =
+      this.inclusion.matcher(repos_name);
+    final Matcher exclusion_matcher =
+      this.exclusion.matcher(repos_name);
+
+    final boolean include = inclusion_matcher.matches();
+    LOG.debug(
+      "include {} with {}: {}",
+      repos_name,
+      this.inclusion.pattern(),
+      Boolean.valueOf(include));
+
+    final boolean exclude = exclusion_matcher.matches();
+    LOG.debug(
+      "exclude {} with {}: {}",
+      repos_name,
+      this.exclusion.pattern(),
+      Boolean.valueOf(exclude));
+
+    return include && !exclude;
   }
 }

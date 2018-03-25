@@ -40,6 +40,32 @@ import java.util.regex.Pattern;
 
 public final class GTServerConfigurations
 {
+  /**
+   * A pattern against which repositories will be matched. If the pattern
+   * matches the repository name, the repository will be included in the set
+   * of repositories to be updated/cloned. Inclusions occur <i>before</i> exclusions.
+   *
+   * @return The default inclusion pattern
+   */
+
+  private static Pattern inclusionPatternDefault()
+  {
+    return Pattern.compile(".*", Pattern.UNICODE_CHARACTER_CLASS);
+  }
+
+  /**
+   * A pattern against which repositories will be matched. If the pattern
+   * matches the repository name, the repository will be ignored and not
+   * updated/cloned. Exclusions occur <i>after</i> inclusions.
+   *
+   * @return The default exclusion pattern
+   */
+
+  private static Pattern exclusionPatternDefault()
+  {
+    return Pattern.compile("^$", Pattern.UNICODE_CHARACTER_CLASS);
+  }
+
   private GTServerConfigurations()
   {
     throw new UnreachableCodeException();
@@ -99,9 +125,27 @@ public final class GTServerConfigurations
         "com.io7m.gtyrell.server.repository_source.%s.user", source_name);
       final String password_key = String.format(
         "com.io7m.gtyrell.server.repository_source.%s.password", source_name);
-      final String user = JProperties.getString(p, user_key);
-      final String pass = JProperties.getString(p, password_key);
-      return GTGithubRepositories.newSource(user, pass);
+      final String inclusion_key = String.format(
+        "com.io7m.gtyrell.server.repository_source.%s.include", source_name);
+      final String exclusion_key = String.format(
+        "com.io7m.gtyrell.server.repository_source.%s.exclude", source_name);
+
+      final String user =
+        JProperties.getString(p, user_key);
+      final String pass =
+        JProperties.getString(p, password_key);
+      final String include =
+        JProperties.getStringOptional(
+          p, inclusion_key, inclusionPatternDefault().pattern());
+      final String exclude =
+        JProperties.getStringOptional(
+          p, exclusion_key, exclusionPatternDefault().pattern());
+
+      return GTGithubRepositories.newSource(
+        user,
+        pass,
+        Pattern.compile(include),
+        Pattern.compile(exclude));
     }
 
     throw new JPropertyException(
