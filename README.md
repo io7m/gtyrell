@@ -1,9 +1,11 @@
 gtyrell
 ===
 
-[![Build Status](https://travis-ci.org/io7m/gtyrell.png)](https://travis-ci.org/io7m/gtyrell)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.io7m.gtyrell/io7m-gtyrell/badge.png)](https://maven-badges.herokuapp.com/maven-central/com.io7m.gtyrell/io7m-gtyrell)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1a59ea6bf43c4f5896a3b0195037be64)](https://www.codacy.com/app/github_79/gtyrell?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=io7m/gtyrell&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://img.shields.io/travis/io7m/gtyrell.svg?style=flat-square)](https://travis-ci.org/io7m/gtyrell)
+[![Maven Central](https://img.shields.io/maven-central/v/com.io7m.gtyrell/com.io7m.gtyrell.svg?style=flat-square)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.io7m.gtyrell%22)
+[![Maven Central (snapshot)](https://img.shields.io/nexus/s/https/oss.sonatype.org/com.io7m.gtyrell/com.io7m.gtyrell.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/com/io7m/gtyrell/)
+[![Codacy Badge](https://img.shields.io/codacy/grade/1a59ea6bf43c4f5896a3b0195037be64.svg?style=flat-square)](https://www.codacy.com/app/github_79/gtyrell?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=io7m/gtyrell&amp;utm_campaign=Badge_Grade)
+[![Codecov](https://img.shields.io/codecov/c/github/io7m/gtyrell.svg?style=flat-square)](https://codecov.io/gh/io7m/gtyrell)
 
 ![gtyrell](./src/site/resources/gtyrell.jpg?raw=true)
 
