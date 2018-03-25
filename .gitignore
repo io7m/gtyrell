@@ -1,4 +1,9 @@
 *.iml
+.checkstyle
+.classpath
 .idea
-io7m-gtyrell-*/target
+.project
+.settings
+com.io7m.gtyrell.*/target
+pom.xml.versionsBackup
 target
