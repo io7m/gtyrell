@@ -41,6 +41,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A repository group producer that fetches the owned repositories of a single
@@ -59,13 +61,24 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   private final String username;
   private final String password;
   private final SimpleDateFormat formatter;
+  private final Pattern inclusion;
+  private final Pattern exclusion;
 
   private GTGithubRepositories(
     final String in_username,
-    final String in_password)
+    final String in_password,
+    final Pattern in_inclusion,
+    final Pattern in_exclusion)
   {
-    this.username = NullCheck.notNull(in_username);
-    this.password = NullCheck.notNull(in_password);
+    this.username =
+      NullCheck.notNull(in_username);
+    this.password =
+      NullCheck.notNull(in_password);
+    this.inclusion =
+      NullCheck.notNull(in_inclusion, "in_inclusion");
+    this.exclusion =
+      NullCheck.notNull(in_exclusion, "in_exclusion");
+
     this.props = new Properties();
     this.props.setProperty("login", this.username);
     this.props.setProperty("password", this.password);
@@ -77,15 +90,20 @@ public final class GTGithubRepositories implements GTRepositorySourceType
    *
    * @param in_username The GitHub user
    * @param in_password The user's password
+   *                       @param in_exclusion The exclusion pattern
+   * @param in_inclusion The inclusion pattern
    *
    * @return A new source
    */
 
   public static GTRepositorySourceType newSource(
     final String in_username,
-    final String in_password)
+    final String in_password,
+    final Pattern in_inclusion,
+    final Pattern in_exclusion)
   {
-    return new GTGithubRepositories(in_username, in_password);
+    return new GTGithubRepositories(
+      in_username, in_password, in_inclusion, in_exclusion);
   }
 
   @Override
@@ -122,6 +140,14 @@ public final class GTGithubRepositories implements GTRepositorySourceType
           r.getOwnerName(),
           r.getName(),
           r.getGitTransportUrl());
+
+        if (!this.repositoryIsIncluded(r.getOwnerName(), r.getName())) {
+          LOG.debug(
+            "repository {}/{} is not included",
+            r.getOwnerName(),
+            r.getName());
+          continue;
+        }
 
         final GTRepositoryGroupName group =
           GTRepositoryGroupName.of(r.getOwnerName());
@@ -161,5 +187,38 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     } catch (final URISyntaxException e) {
       throw new IOException(e);
     }
+  }
+
+  private boolean repositoryIsIncluded(
+    final String owner_name,
+    final String name)
+  {
+    final String repos_name =
+      new StringBuilder(128)
+        .append(owner_name)
+        .append("/")
+        .append(name)
+        .toString();
+
+    final Matcher inclusion_matcher =
+      this.inclusion.matcher(repos_name);
+    final Matcher exclusion_matcher =
+      this.exclusion.matcher(repos_name);
+
+    final boolean include = inclusion_matcher.matches();
+    LOG.debug(
+      "include {} with {}: {}",
+      repos_name,
+      this.inclusion.pattern(),
+      Boolean.valueOf(include));
+
+    final boolean exclude = exclusion_matcher.matches();
+    LOG.debug(
+      "exclude {} with {}: {}",
+      repos_name,
+      this.exclusion.pattern(),
+      Boolean.valueOf(exclude));
+
+    return include && !exclude;
   }
 }

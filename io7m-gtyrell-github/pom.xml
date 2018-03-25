@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.io7m.gtyrell</groupId>
     <artifactId>io7m-gtyrell</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0-JDK8-BACKPORT</version>
   </parent>
   <artifactId>io7m-gtyrell-github</artifactId>
 
