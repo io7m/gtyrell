@@ -20,13 +20,12 @@ import com.io7m.gtyrell.core.GTGitExecutable;
 import com.io7m.gtyrell.core.GTGitExecutableType;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.github.GTGithubRepositories;
-import com.io7m.jnull.NullCheck;
 import com.io7m.jproperties.JProperties;
 import com.io7m.jproperties.JPropertyException;
 import com.io7m.jproperties.JPropertyIncorrectType;
 import com.io7m.jproperties.JPropertyNonexistent;
 import com.io7m.junreachable.UnreachableCodeException;
-import javaslang.collection.List;
+import io.vavr.collection.List;
 
 import java.io.File;
 import java.time.Duration;
@@ -60,7 +59,7 @@ public final class GTServerConfigurations
     final Properties p)
     throws JPropertyException
   {
-    NullCheck.notNull(p);
+    Objects.requireNonNull(p, "p");
 
     final File root = parseDirectory(p);
     final GTGitExecutableType git = parseGit(p);
@@ -87,8 +86,8 @@ public final class GTServerConfigurations
     final String source_name)
     throws JPropertyException
   {
-    NullCheck.notNull(p);
-    NullCheck.notNull(source_name);
+    Objects.requireNonNull(p, "p");
+    Objects.requireNonNull(source_name, "source_name");
 
     final String type_key = String.format(
       "com.io7m.gtyrell.server.repository_source.%s.type", source_name);

@@ -16,7 +16,7 @@
 
 package com.io7m.gtyrell.core;
 
-import com.io7m.jnull.NullCheck;
+import java.util.Objects;
 import org.immutables.value.Value;
 
 import java.util.regex.Matcher;
@@ -62,6 +62,6 @@ public interface GTRepositoryNameType extends Comparable<GTRepositoryNameType>
   default int compareTo(
     final GTRepositoryNameType o)
   {
-    return this.text().compareTo(NullCheck.notNull(o, "Other").text());
+    return this.text().compareTo(Objects.requireNonNull(o, "Other").text());
   }
 }

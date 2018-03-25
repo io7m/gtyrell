@@ -22,7 +22,6 @@ import com.io7m.gtyrell.core.GTGitExecutableType;
 import com.io7m.gtyrell.core.GTRepositoryGroupName;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositoryType;
-import com.io7m.jnull.NullCheck;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CountingInputStream;
 import org.apache.commons.io.input.ProxyInputStream;
@@ -69,12 +68,18 @@ final class GTGithubRepository implements GTRepositoryType
     final GTRepositoryName in_name,
     final URI in_url)
   {
-    this.username = NullCheck.notNull(in_username);
-    this.password = NullCheck.notNull(in_password);
-    this.git = NullCheck.notNull(in_git, "Git");
-    this.url = NullCheck.notNull(in_url, "URL");
-    this.group = NullCheck.notNull(in_group, "Group");
-    this.name = NullCheck.notNull(in_name, "Name");
+    this.username =
+      Objects.requireNonNull(in_username, "in_username");
+    this.password =
+      Objects.requireNonNull(in_password, "in_password");
+    this.git =
+      Objects.requireNonNull(in_git, "Git");
+    this.url =
+      Objects.requireNonNull(in_url, "URL");
+    this.group =
+      Objects.requireNonNull(in_group, "Group");
+    this.name =
+      Objects.requireNonNull(in_name, "Name");
   }
 
   private static GZIPOutputStream createOutput(
@@ -197,7 +202,7 @@ final class GTGithubRepository implements GTRepositoryType
       final InputStream in_outer)
     {
       super(in_outer);
-      this.inner = NullCheck.notNull(in_inner, "Inner");
+      this.inner = Objects.requireNonNull(in_inner, "Inner");
     }
 
     static CountedMaybeCompressedStream fromHTTPConnection(

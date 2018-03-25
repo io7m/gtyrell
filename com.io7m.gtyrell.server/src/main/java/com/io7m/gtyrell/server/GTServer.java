@@ -21,11 +21,11 @@ import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.core.GTRepositoryType;
-import com.io7m.jnull.NullCheck;
-import javaslang.Tuple2;
-import javaslang.collection.List;
-import javaslang.collection.Map;
-import javaslang.collection.SortedMap;
+import java.util.Objects;
+import io.vavr.Tuple2;
+import io.vavr.collection.List;
+import io.vavr.collection.Map;
+import io.vavr.collection.SortedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +36,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * A server that mirrors a set of repository groups into a directory.
@@ -57,7 +59,7 @@ public final class GTServer implements GTServerType
   private GTServer(
     final GTServerConfiguration in_config)
   {
-    this.config = NullCheck.notNull(in_config, "Config");
+    this.config = requireNonNull(in_config, "Config");
     this.done = new AtomicBoolean(false);
     this.started = new AtomicBoolean(false);
     this.timer = new Timer();
@@ -74,7 +76,7 @@ public final class GTServer implements GTServerType
   public static GTServerType newServer(
     final GTServerConfiguration config)
   {
-    NullCheck.notNull(config);
+    Objects.requireNonNull(config, "config");
 
     return new GTServer(config);
   }
@@ -148,7 +150,7 @@ public final class GTServer implements GTServerType
       }
 
       final GTRepositorySourceType p =
-        NullCheck.notNull(producers.get(index));
+        Objects.requireNonNull(producers.get(index), "producers.get(index)");
 
       LOG.debug("retrieving repository groups");
       final SortedMap<GTRepositoryGroupName, GTRepositoryGroupType> groups;
@@ -203,7 +205,9 @@ public final class GTServer implements GTServerType
       }
 
       final GTRepositoryType repos =
-        NullCheck.notNull(repositories.get(name).get());
+        Objects.requireNonNull(
+          repositories.get(name).get(),
+          "repositories.get(name).get()");
 
       LOG.debug("syncing {}", repos);
       try {

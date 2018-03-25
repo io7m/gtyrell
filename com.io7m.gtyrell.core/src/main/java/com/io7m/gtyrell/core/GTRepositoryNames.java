@@ -16,10 +16,13 @@
 
 package com.io7m.gtyrell.core;
 
-import com.io7m.jnull.NullCheck;
+import java.util.Objects;
 import com.io7m.junreachable.UnreachableCodeException;
 
 import java.util.regex.Pattern;
+
+import static java.util.regex.Pattern.UNICODE_CHARACTER_CLASS;
+import static java.util.regex.Pattern.compile;
 
 /**
  * Functions over repository names.
@@ -32,9 +35,9 @@ public final class GTRepositoryNames
    */
 
   public static final Pattern PATTERN =
-    NullCheck.notNull(Pattern.compile(
+    Objects.requireNonNull(compile(
       "[\\p{Alnum}_\\-][\\p{Alnum}_\\-\\.]{0,127}",
-      Pattern.UNICODE_CHARACTER_CLASS));
+      UNICODE_CHARACTER_CLASS), "Pattern");
 
   private GTRepositoryNames()
   {

@@ -19,7 +19,7 @@ package com.io7m.gtyrell.server;
 import com.io7m.gtyrell.core.GTGitExecutableType;
 import com.io7m.gtyrell.core.GTImmutableStyleType;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
-import javaslang.collection.List;
+import io.vavr.collection.List;
 import org.immutables.value.Value;
 
 import java.io.File;

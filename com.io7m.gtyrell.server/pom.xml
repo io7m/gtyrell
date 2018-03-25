@@ -32,16 +32,12 @@
     </dependency>
 
     <dependency>
-      <groupId>com.io7m.jnull</groupId>
-      <artifactId>io7m-jnull-core</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.io7m.junreachable</groupId>
-      <artifactId>io7m-junreachable-core</artifactId>
+      <artifactId>com.io7m.junreachable.core</artifactId>
     </dependency>
     <dependency>
       <groupId>com.io7m.jproperties</groupId>
-      <artifactId>io7m-jproperties-core</artifactId>
+      <artifactId>com.io7m.jproperties.core</artifactId>
     </dependency>
 
     <dependency>
@@ -53,8 +49,8 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.javaslang</groupId>
-      <artifactId>javaslang</artifactId>
+      <groupId>io.vavr</groupId>
+      <artifactId>vavr</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.mail</groupId>
@@ -112,7 +108,7 @@
                   </includes>
                 </filter>
                 <filter>
-                  <artifact>io.javaslang:*</artifact>
+                  <artifact>io.io.vavr:*</artifact>
                   <includes>
                     <include>**</include>
                   </includes>

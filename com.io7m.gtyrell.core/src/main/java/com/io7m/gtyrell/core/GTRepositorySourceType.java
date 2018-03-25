@@ -16,7 +16,7 @@
 
 package com.io7m.gtyrell.core;
 
-import javaslang.collection.SortedMap;
+import io.vavr.collection.SortedMap;
 
 import java.io.IOException;
 

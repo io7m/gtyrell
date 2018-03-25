@@ -19,11 +19,4 @@
   <description>Git mirroring tool (Checkstyle policy)</description>
   <url>http://io7m.github.io/gtyrell/</url>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.io7m.jnull</groupId>
-      <artifactId>io7m-jnull-core</artifactId>
-    </dependency>
-  </dependencies>
-
 </project>

@@ -16,7 +16,7 @@
 
 package com.io7m.gtyrell.core;
 
-import com.io7m.jnull.NullCheck;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public final class GTGitExecutable implements GTGitExecutableType
   private GTGitExecutable(
     final File in_exec)
   {
-    this.exec = NullCheck.notNull(in_exec);
+    this.exec = Objects.requireNonNull(in_exec, "in_exec");
   }
 
   /**
@@ -67,8 +67,8 @@ public final class GTGitExecutable implements GTGitExecutableType
     final File output)
     throws IOException
   {
-    NullCheck.notNull(url);
-    NullCheck.notNull(output);
+    Objects.requireNonNull(url, "url");
+    Objects.requireNonNull(output, "output");
 
     final List<String> args = new ArrayList<>(4);
     args.add(this.exec.toString());
@@ -100,7 +100,7 @@ public final class GTGitExecutable implements GTGitExecutableType
   public void fetch(final File repository)
     throws IOException
   {
-    NullCheck.notNull(repository);
+    Objects.requireNonNull(repository, "repository");
 
     final File repository_dir = repository.getCanonicalFile();
     if (!repository_dir.isDirectory()) {

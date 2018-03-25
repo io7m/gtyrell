@@ -23,10 +23,10 @@ import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.core.GTRepositoryType;
-import com.io7m.jnull.NullCheck;
-import javaslang.Tuple;
-import javaslang.collection.SortedMap;
-import javaslang.collection.TreeMap;
+import java.util.Objects;
+import io.vavr.Tuple;
+import io.vavr.collection.SortedMap;
+import io.vavr.collection.TreeMap;
 import org.kohsuke.github.GHMyself;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
@@ -64,8 +64,8 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     final String in_username,
     final String in_password)
   {
-    this.username = NullCheck.notNull(in_username);
-    this.password = NullCheck.notNull(in_password);
+    this.username = Objects.requireNonNull(in_username, "in_username");
+    this.password = Objects.requireNonNull(in_password, "in_password");
     this.props = new Properties();
     this.props.setProperty("login", this.username);
     this.props.setProperty("password", this.password);
@@ -93,7 +93,7 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     final GTGitExecutableType in_git)
     throws IOException
   {
-    NullCheck.notNull(in_git, "Git");
+    Objects.requireNonNull(in_git, "Git");
 
     try {
       final GitHubBuilder ghb = GitHubBuilder.fromProperties(this.props);
