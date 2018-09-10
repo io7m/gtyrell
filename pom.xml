@@ -19,15 +19,12 @@
   <url>http://github.com/io7m/gtyrell</url>
 
   <modules>
-    <module>com.io7m.gtyrell.checkstyle</module>
     <module>com.io7m.gtyrell.core</module>
     <module>com.io7m.gtyrell.github</module>
     <module>com.io7m.gtyrell.server</module>
   </modules>
 
   <properties>
-    <io7m.checkstyle.artifact>com.io7m.gtyrell.checkstyle</io7m.checkstyle.artifact>
-    <io7m.checkstyle.path>/com/io7m/gtyrell/checkstyle/checkstyle.xml</io7m.checkstyle.path>
     <io7m.api.previousVersion>1.0.0</io7m.api.previousVersion>
   </properties>
 
@@ -136,6 +133,11 @@
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
         <version>1.5.0-b01</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>2.9.4</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
