@@ -77,7 +77,7 @@ The `include-and-halt` command marks a repository as included if the pattern
 matches the  repository name. Evaluation of other rules halts if the pattern
 matches.
 
-The `exclude-and-halt` command marks a repository as included if the pattern
+The `exclude-and-halt` command marks a repository as excluded if the pattern
 matches the  repository name. Evaluation of other rules halts if the pattern
 matches.
 
