@@ -23,15 +23,12 @@ import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.core.GTRepositoryType;
+import com.io7m.gtyrell.filter.GTFilterProgram;
 import io.vavr.Tuple;
 import io.vavr.collection.SortedMap;
 import io.vavr.collection.TreeMap;
 import org.kohsuke.github.GHMyself;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.PagedIterable;
-import org.kohsuke.github.PagedIterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,12 +38,10 @@ import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * A repository group producer that fetches the owned repositories of a single
- * (authenticated) user on GitHub.
+ * A repository group producer that fetches the owned repositories of a single (authenticated) user
+ * on GitHub.
  */
 
 public final class GTGithubRepositories implements GTRepositorySourceType
@@ -61,23 +56,19 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   private final String username;
   private final String password;
   private final SimpleDateFormat formatter;
-  private final Pattern inclusion;
-  private final Pattern exclusion;
+  private final GTFilterProgram filter;
 
   private GTGithubRepositories(
     final String in_username,
     final String in_password,
-    final Pattern in_inclusion,
-    final Pattern in_exclusion)
+    final GTFilterProgram in_filter)
   {
     this.username =
       Objects.requireNonNull(in_username, "in_username");
     this.password =
       Objects.requireNonNull(in_password, "in_password");
-    this.inclusion =
-      Objects.requireNonNull(in_inclusion, "in_inclusion");
-    this.exclusion =
-      Objects.requireNonNull(in_exclusion, "in_exclusion");
+    this.filter =
+      Objects.requireNonNull(in_filter, "filter");
 
     this.props = new Properties();
     this.props.setProperty("login", this.username);
@@ -88,10 +79,9 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   /**
    * Create a new repository source.
    *
-   * @param in_username  The GitHub user
-   * @param in_password  The user's password
-   * @param in_exclusion The exclusion pattern
-   * @param in_inclusion The inclusion pattern
+   * @param in_username The GitHub user
+   * @param in_password The user's password
+   * @param in_filter   The repository filter
    *
    * @return A new source
    */
@@ -99,11 +89,9 @@ public final class GTGithubRepositories implements GTRepositorySourceType
   public static GTRepositorySourceType newSource(
     final String in_username,
     final String in_password,
-    final Pattern in_inclusion,
-    final Pattern in_exclusion)
+    final GTFilterProgram in_filter)
   {
-    return new GTGithubRepositories(
-      in_username, in_password, in_inclusion, in_exclusion);
+    return new GTGithubRepositories(in_username, in_password, in_filter);
   }
 
   @Override
@@ -114,8 +102,8 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     Objects.requireNonNull(in_git, "Git");
 
     try {
-      final GitHubBuilder ghb = GitHubBuilder.fromProperties(this.props);
-      final GitHub gh = ghb.build();
+      final var ghb = GitHubBuilder.fromProperties(this.props);
+      final var gh = ghb.build();
 
       LOG.debug(
         "github api rate limit {} remaining {} reset {}",
@@ -123,17 +111,16 @@ public final class GTGithubRepositories implements GTRepositorySourceType
         Integer.valueOf(gh.rateLimit().remaining),
         this.formatter.format(gh.rateLimit().getResetDate()));
 
-      final GHMyself me = gh.getMyself();
+      final var me = gh.getMyself();
 
       SortedMap<GTRepositoryGroupName, SortedMap<GTRepositoryName, GTRepositoryType>> groups =
         TreeMap.empty();
 
-      final PagedIterable<GHRepository> rs =
-        me.listRepositories(100, GHMyself.RepositoryListFilter.ALL);
-      final PagedIterator<GHRepository> rsi = rs.iterator();
+      final var rs = me.listRepositories(100, GHMyself.RepositoryListFilter.ALL);
+      final var rsi = rs.iterator();
 
       while (rsi.hasNext()) {
-        final GHRepository r = rsi.next();
+        final var r = rsi.next();
 
         LOG.debug(
           "repository: {}/{} {}",
@@ -149,14 +136,14 @@ public final class GTGithubRepositories implements GTRepositorySourceType
           continue;
         }
 
-        final GTRepositoryGroupName group =
+        final var group =
           GTRepositoryGroupName.of(r.getOwnerName());
-        final GTRepositoryName name =
+        final var name =
           GTRepositoryName.of(r.getName());
-        final URI base_clone_url =
+        final var base_clone_url =
           new URI(r.gitHttpTransportUrl());
 
-        final URI clone_url =
+        final var clone_url =
           new URI(
             base_clone_url.getScheme(),
             this.username,
@@ -193,32 +180,13 @@ public final class GTGithubRepositories implements GTRepositorySourceType
     final String owner_name,
     final String name)
   {
-    final String repos_name =
+    final var repos_name =
       new StringBuilder(128)
         .append(owner_name)
         .append("/")
         .append(name)
         .toString();
 
-    final Matcher inclusion_matcher =
-      this.inclusion.matcher(repos_name);
-    final Matcher exclusion_matcher =
-      this.exclusion.matcher(repos_name);
-
-    final boolean include = inclusion_matcher.matches();
-    LOG.debug(
-      "include {} with {}: {}",
-      repos_name,
-      this.inclusion.pattern(),
-      Boolean.valueOf(include));
-
-    final boolean exclude = exclusion_matcher.matches();
-    LOG.debug(
-      "exclude {} with {}: {}",
-      repos_name,
-      this.exclusion.pattern(),
-      Boolean.valueOf(exclude));
-
-    return include && !exclude;
+    return this.filter.includes(LOG, repos_name);
   }
 }

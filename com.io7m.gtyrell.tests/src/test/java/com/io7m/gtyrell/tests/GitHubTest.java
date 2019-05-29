@@ -14,7 +14,7 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-package com.io7m.gtyrell.tests.github;
+package com.io7m.gtyrell.tests;
 
 import com.io7m.junreachable.UnreachableCodeException;
 import org.kohsuke.github.GHMyself;

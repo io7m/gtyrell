@@ -30,6 +30,11 @@
       <artifactId>com.io7m.gtyrell.github</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.gtyrell.filter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.io7m.junreachable</groupId>
@@ -38,6 +43,10 @@
     <dependency>
       <groupId>com.io7m.jproperties</groupId>
       <artifactId>com.io7m.jproperties.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.io7m.jlexing</groupId>
+      <artifactId>com.io7m.jlexing.core</artifactId>
     </dependency>
 
     <dependency>
@@ -152,12 +161,6 @@
             Export-Package: com.io7m.gtyrell.server
 ]]></bnd>
         </configuration>
-      </plugin>
-
-      <!-- Determine test coverage -->
-      <plugin>
-        <groupId>org.jacoco</groupId>
-        <artifactId>jacoco-maven-plugin</artifactId>
       </plugin>
 
       <!-- Ignore dependencies that bytecode analysis doesn't catch -->

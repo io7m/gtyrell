@@ -19,6 +19,9 @@ package com.io7m.gtyrell.server;
 import com.io7m.gtyrell.core.GTGitExecutable;
 import com.io7m.gtyrell.core.GTGitExecutableType;
 import com.io7m.gtyrell.core.GTRepositorySourceType;
+import com.io7m.gtyrell.filter.GTFilterCompilerException;
+import com.io7m.gtyrell.filter.GTFilterCompilersType;
+import com.io7m.gtyrell.filter.GTFilterProgram;
 import com.io7m.gtyrell.github.GTGithubRepositories;
 import com.io7m.jproperties.JProperties;
 import com.io7m.jproperties.JPropertyException;
@@ -28,10 +31,13 @@ import com.io7m.junreachable.UnreachableCodeException;
 import io.vavr.collection.List;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -40,32 +46,6 @@ import java.util.regex.Pattern;
 
 public final class GTServerConfigurations
 {
-  /**
-   * A pattern against which repositories will be matched. If the pattern
-   * matches the repository name, the repository will be included in the set
-   * of repositories to be updated/cloned. Inclusions occur <i>before</i> exclusions.
-   *
-   * @return The default inclusion pattern
-   */
-
-  private static Pattern inclusionPatternDefault()
-  {
-    return Pattern.compile(".*", Pattern.UNICODE_CHARACTER_CLASS);
-  }
-
-  /**
-   * A pattern against which repositories will be matched. If the pattern
-   * matches the repository name, the repository will be ignored and not
-   * updated/cloned. Exclusions occur <i>after</i> inclusions.
-   *
-   * @return The default exclusion pattern
-   */
-
-  private static Pattern exclusionPatternDefault()
-  {
-    return Pattern.compile("^$", Pattern.UNICODE_CHARACTER_CLASS);
-  }
-
   private GTServerConfigurations()
   {
     throw new UnreachableCodeException();
@@ -75,32 +55,37 @@ public final class GTServerConfigurations
    * Load a server configuration from the given properties.
    *
    * @param p The properties
+   * @param compilers A provider of compilers for filter rules
    *
    * @return A new server configuration
    *
-   * @throws JPropertyException On missing or malformed properties
+   * @throws JPropertyException        On missing or malformed properties
+   * @throws IOException               On I/O errors
+   * @throws GTFilterCompilerException On filter program compilation errors
    */
 
   public static GTServerConfiguration fromProperties(
+    final GTFilterCompilersType compilers,
     final Properties p)
-    throws JPropertyException
+    throws JPropertyException, IOException, GTFilterCompilerException
   {
+    Objects.requireNonNull(compilers, "compilers");
     Objects.requireNonNull(p, "p");
 
-    final File root = parseDirectory(p);
-    final GTGitExecutableType git = parseGit(p);
-    final Duration pause = parseDuration(p);
+    final var root = parseDirectory(p);
+    final var git = parseGit(p);
+    final var pause = parseDuration(p);
 
     List<GTRepositorySourceType> sources = List.empty();
-    final String source_names_text =
+    final var source_names_text =
       JProperties.getString(p, "com.io7m.gtyrell.server.repository_sources");
-    final String[] source_names = source_names_text.split("\\s+");
-    for (final String source_name : source_names) {
-      final GTRepositorySourceType source = parseSource(p, source_name);
+    final var source_names = source_names_text.split("\\s+");
+    for (final var source_name : source_names) {
+      final var source = parseSource(compilers, p, source_name);
       sources = sources.append(source);
     }
 
-    final boolean dry_run =
+    final var dry_run =
       JProperties.getBooleanOptional(
         p, "com.io7m.gtyrell.server.dry_run", false);
 
@@ -108,44 +93,41 @@ public final class GTServerConfigurations
   }
 
   private static GTRepositorySourceType parseSource(
+    final GTFilterCompilersType compilers,
     final Properties p,
     final String source_name)
-    throws JPropertyException
+    throws JPropertyException, IOException, GTFilterCompilerException
   {
     Objects.requireNonNull(p, "p");
     Objects.requireNonNull(source_name, "source_name");
 
-    final String type_key = String.format(
+    final var type_key = String.format(
       "com.io7m.gtyrell.server.repository_source.%s.type", source_name);
-    final String type = JProperties.getString(
+    final var type = JProperties.getString(
       p, type_key);
 
     if (Objects.equals("github", type)) {
-      final String user_key = String.format(
+      final var user_key = String.format(
         "com.io7m.gtyrell.server.repository_source.%s.user", source_name);
-      final String password_key = String.format(
+      final var password_key = String.format(
         "com.io7m.gtyrell.server.repository_source.%s.password", source_name);
-      final String inclusion_key = String.format(
-        "com.io7m.gtyrell.server.repository_source.%s.include", source_name);
-      final String exclusion_key = String.format(
-        "com.io7m.gtyrell.server.repository_source.%s.exclude", source_name);
+      final var filter_file_key = String.format(
+        "com.io7m.gtyrell.server.repository_source.%s.filter", source_name);
 
-      final String user =
+      final var user =
         JProperties.getString(p, user_key);
-      final String pass =
+      final var pass =
         JProperties.getString(p, password_key);
-      final String include =
-        JProperties.getStringOptional(
-          p, inclusion_key, inclusionPatternDefault().pattern());
-      final String exclude =
-        JProperties.getStringOptional(
-          p, exclusion_key, exclusionPatternDefault().pattern());
+      final var filter_file =
+        JProperties.getString(p, filter_file_key);
 
-      return GTGithubRepositories.newSource(
-        user,
-        pass,
-        Pattern.compile(include),
-        Pattern.compile(exclude));
+      final GTFilterProgram filter;
+      try (var stream = Files.newInputStream(Paths.get(filter_file))) {
+        final var compiler = compilers.createFor(URI.create(filter_file), stream);
+        filter = compiler.compile();
+      }
+
+      return GTGithubRepositories.newSource(user, pass, filter);
     }
 
     throw new JPropertyException(
@@ -173,19 +155,19 @@ public final class GTServerConfigurations
   private static Duration parseDuration(final Properties p)
     throws JPropertyNonexistent, JPropertyIncorrectType
   {
-    final String duration_text = JProperties.getString(
+    final var duration_text = JProperties.getString(
       p, "com.io7m.gtyrell.server.pause_duration");
 
-    final Pattern pattern = Pattern.compile("([0-9]+)h ([0-9]+)m ([0-9]+)s");
-    final Matcher matcher = pattern.matcher(duration_text);
+    final var pattern = Pattern.compile("([0-9]+)h ([0-9]+)m ([0-9]+)s");
+    final var matcher = pattern.matcher(duration_text);
     if (matcher.matches()) {
-      final Duration hours =
+      final var hours =
         Duration.ofHours(Long.parseUnsignedLong(matcher.group(1)));
-      final Duration minutes =
+      final var minutes =
         Duration.ofMinutes(Long.parseUnsignedLong(matcher.group(2)));
-      final Duration seconds =
+      final var seconds =
         Duration.ofSeconds(Long.parseUnsignedLong(matcher.group(3)));
-      final Duration total =
+      final var total =
         hours.plus(minutes).plus(seconds);
 
       if (total.getSeconds() < 1L) {

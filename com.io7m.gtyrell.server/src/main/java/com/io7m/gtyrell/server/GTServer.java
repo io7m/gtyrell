@@ -19,11 +19,7 @@ package com.io7m.gtyrell.server;
 import com.io7m.gtyrell.core.GTRepositoryGroupName;
 import com.io7m.gtyrell.core.GTRepositoryGroupType;
 import com.io7m.gtyrell.core.GTRepositoryName;
-import com.io7m.gtyrell.core.GTRepositorySourceType;
 import com.io7m.gtyrell.core.GTRepositoryType;
-import java.util.Objects;
-import io.vavr.Tuple2;
-import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.SortedMap;
 import org.slf4j.Logger;
@@ -33,11 +29,10 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * A server that mirrors a set of repository groups into a directory.
@@ -59,7 +54,7 @@ public final class GTServer implements GTServerType
   private GTServer(
     final GTServerConfiguration in_config)
   {
-    this.config = requireNonNull(in_config, "Config");
+    this.config = Objects.requireNonNull(in_config, "Config");
     this.done = new AtomicBoolean(false);
     this.started = new AtomicBoolean(false);
     this.timer = new Timer();
@@ -86,8 +81,7 @@ public final class GTServer implements GTServerType
     final GTRepositoryGroupName group,
     final GTRepositoryName name)
   {
-    return new File(
-      new File(directory, group.text()), name.text() + ".git");
+    return new File(new File(directory, group.text()), name.text() + ".git");
   }
 
   @Override
@@ -127,8 +121,8 @@ public final class GTServer implements GTServerType
 
   private String version()
   {
-    final Package p = this.getClass().getPackage();
-    final String v = p.getImplementationVersion();
+    final var p = this.getClass().getPackage();
+    final var v = p.getImplementationVersion();
     if (v != null) {
       return "gtyrell " + v;
     }
@@ -139,17 +133,17 @@ public final class GTServer implements GTServerType
   {
     LOG.debug("running sync");
 
-    final Instant time_then = Instant.now();
+    final var time_then = Instant.now();
 
-    final List<GTRepositorySourceType> producers =
+    final var producers =
       this.config.producers();
-    for (int index = 0; index < producers.size(); ++index) {
+    for (var index = 0; index < producers.size(); ++index) {
       if (this.done.get()) {
         LOG.debug("stopping server");
         return;
       }
 
-      final GTRepositorySourceType p =
+      final var p =
         Objects.requireNonNull(producers.get(index), "producers.get(index)");
 
       LOG.debug("retrieving repository groups");
@@ -157,7 +151,7 @@ public final class GTServer implements GTServerType
 
       try {
         groups = p.get(this.config.git());
-        for (final Tuple2<GTRepositoryGroupName, GTRepositoryGroupType> group : groups) {
+        for (final var group : groups) {
           try {
             this.syncGroup(group._2);
           } catch (final Exception e) {
@@ -169,7 +163,7 @@ public final class GTServer implements GTServerType
       }
     }
 
-    final Instant time_now = Instant.now();
+    final var time_now = Instant.now();
     LOG.debug("sync took {}", elapsedTime(time_then, time_now));
     LOG.debug("sync completed, pausing");
   }
@@ -178,12 +172,12 @@ public final class GTServer implements GTServerType
     final Instant time_then,
     final Instant time_now)
   {
-    final long elapsed = time_then.until(time_now, ChronoUnit.SECONDS);
+    final var elapsed = time_then.until(time_now, ChronoUnit.SECONDS);
 
-    final int seconds = Math.toIntExact(elapsed % 60L);
-    final int new_elapsed = Math.toIntExact(elapsed / 60L);
-    final int minutes = new_elapsed % 60;
-    final int hours = new_elapsed / 60;
+    final var seconds = Math.toIntExact(elapsed % 60L);
+    final var new_elapsed = Math.toIntExact(elapsed / 60L);
+    final var minutes = new_elapsed % 60;
+    final var hours = new_elapsed / 60;
 
     return String.format(
       "%sh %sm %ss",
@@ -194,24 +188,24 @@ public final class GTServer implements GTServerType
 
   private void syncGroup(final GTRepositoryGroupType g)
   {
-    final GTRepositoryGroupName group = g.groupName();
+    final var group = g.groupName();
     LOG.debug("syncing repository group: {}", group.text());
 
     final Map<GTRepositoryName, GTRepositoryType> repositories = g.repositories();
-    for (final GTRepositoryName name : repositories.keySet()) {
+    for (final var name : repositories.keySet()) {
       if (this.done.get()) {
         LOG.debug("stopping server");
         return;
       }
 
-      final GTRepositoryType repos =
+      final var repos =
         Objects.requireNonNull(
           repositories.get(name).get(),
           "repositories.get(name).get()");
 
       LOG.debug("syncing {}", repos);
       try {
-        final File output =
+        final var output =
           makeRepositoryName(this.config.directory(), group, name);
         if (!this.config.dryRun()) {
           repos.update(output);

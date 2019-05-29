@@ -38,39 +38,109 @@ The server will not fork into the background and can be safely used under
 a process supervision system such as [s6](http://www.skarnet.org/software/s6/)
 without issues.
 
-## Inclusions/Exclusions
+## Inclusions/Exclusion filters
 
 It's possible to explicitly include and exclude repositories from being
-cloned and/or updated. This is achieved by specifying an inclusion
-and/or an exclusion pattern for the repository source:
+cloned and/or updated. This is achieved by specifying a filter program:
 
 ```
 com.io7m.gtyrell.server.repository_source.github0.type     = github
 com.io7m.gtyrell.server.repository_source.github0.user     = yourgithubusername
 com.io7m.gtyrell.server.repository_source.github0.password = yourgithubpassword
-com.io7m.gtyrell.server.repository_source.github0.include  = ^ExampleOwner/ReposA$
-com.io7m.gtyrell.server.repository_source.github0.exclude  = ^$
+com.io7m.gtyrell.server.repository_source.github0.filter   = /etc/filter.conf
 ```
+
+The file referenced by `com.io7m.gtyrell.server.repository_source.github0.filter`
+must contain a filter program. Filter programs are specified with a line-based
+format consisting of rules evaluated from top to bottom. An example filter
+file:
+
+```
+include ^.*$
+exclude ^x/.*$
+include-and-halt ^x/y$
+exclude-and-halt ^z/.*$
+```
+
+A _filter rule_ must be one of `include`, `exclude`, `include-and-halt`, or
+`exclude-and-halt`. The incoming repository names are matched against the patterns
+given in the filter rules. A repository is included or excluded based on the
+result of the _last_ rule that matched the repository.
+
+The `include` command marks a repository as included if the pattern matches the
+repository name. Evaluation of other rules continues if the pattern matches.
+
+The `exclude` command marks a repository as excluded if the pattern matches the
+repository name. Evaluation of other rules continues if the pattern matches.
+
+The `include-and-halt` command marks a repository as included if the pattern
+matches the  repository name. Evaluation of other rules halts if the pattern
+matches.
+
+The `exclude-and-halt` command marks a repository as included if the pattern
+matches the  repository name. Evaluation of other rules halts if the pattern
+matches.
+
+If no rules are specified at all, no repositories are included. If no rules
+match at all for a given repository, the repository is not included.
 
 Patterns are given in [Java regular expression syntax](https://docs.oracle.com/javase/9/docs/api/java/util/regex/Pattern.html)
 and are matched against the incoming repository owner and name separated by a slash.
-The exact check performed is `includes(name) && !excludes(name)`.
-If no patterns are specified, then the patterns default to the following values:
+
+Given this example:
 
 ```
-com.io7m.gtyrell.server.repository_source.github0.include  = ^.*$
-com.io7m.gtyrell.server.repository_source.github0.exclude  = ^$
+include ^.*$
+exclude ^x/.*$
+include-and-halt ^x/y$
+exclude-and-halt ^z/.*$
+include ^z/a$
 ```
 
-This has the effect of including every repository, and excluding none of them.
+A repository `a/b`:
 
-```
-# Include everything but exclude io7m/gtyrell
-com.io7m.gtyrell.server.repository_source.github0.include  = ^.*$
-com.io7m.gtyrell.server.repository_source.github0.exclude  = ^io7m/gtyrell$
+  1. Will match rule 1 and therefore will, currently, be included
+  2. Will not match rule 2 and therefore its inclusion status will not change
+  3. Will not match rule 3 and therefore its inclusion status will not change
+  4. Will not match rule 4 and therefore its inclusion status will not change
+  5. Will not match rule 5 and therefore its inclusion status will not change
 
-# Include only io7m projects
-com.io7m.gtyrell.server.repository_source.github0.include  = ^io7m/.*$
-com.io7m.gtyrell.server.repository_source.github0.exclude  = ^$
-```
+As a result, `a/b` will be included as rule 1 included it and no other subsequent
+rules changed this.
 
+A repository `x/q`:
+
+  1. Will match rule 1 and therefore will, currently, be included
+  2. Will match rule 2 and therefore its inclusion status will be changed to _excluded_
+  3. Will not match rule 3 and therefore its inclusion status will not change
+  4. Will not match rule 4 and therefore its inclusion status will not change
+  5. Will not match rule 5 and therefore its inclusion status will not change
+
+As a result, `x/q` will be not included as rule 2 excluded it and no other subsequent
+rules changed this.
+
+A repository `x/y`:
+
+  1. Will match rule 1 and therefore will, currently, be included
+  2. Will not match rule 2 and therefore its inclusion status will not change
+  3. Will match rule 3 and therefore its inclusion status will be changed to _included_ and evaluation will be halted here
+  4. Rule 4 is not evaluated because rule 3 matched and halted evaluation
+  5. Rule 5 is not evaluated because rule 3 matched and halted evaluation
+
+As a result, `x/y` will be included as rule 3 included it and evaluation was
+halted at that point.
+
+A repository `z/a`:
+
+  1. Will match rule 1 and therefore will, currently, be included
+  2. Will not match rule 2 and therefore its inclusion status will not change
+  3. Will not match rule 3 and therefore its inclusion status will not change
+  4. Will match rule 4 and therefore its inclusion status will be changed to _excluded_ and evaluation will be halted here
+  5. Rule 5 is not evaluated because rule 4 matched and halted evaluation
+
+As a result, `z/a` will be excluded as rule 4 excluded it and evaluation was
+halted at that point. Note that rule 5 would have matched the input exactly,
+but rule 4 prevented that rule from being evaluated.
+
+The filter rules are inspired by [OpenBSD](https://www.openbsd.org)'s [pf](https://www.openbsd.org/faq/pf/)
+packet filter.
