@@ -45,7 +45,7 @@
     <c:release date="2018-03-25T11:40:10+00:00" ticket-system="com.github.io7m.gtyrell" version="2.0.0">
       <c:changes>
         <c:change compatible="false" date="2018-03-25T00:00:00+00:00" summary="Add inclusion/exclusion patterns"/>
-        <c:change compatible="false" date="2018-03-25T11:40:10+00:00" summary="Start requiring Java 9, and upgrade all dependencies to modern versions and/or replacements."/>
+        <c:change compatible="false" date="2018-03-25T11:40:10+00:00" summary="Start requiring Java 11, and upgrade all dependencies to modern versions and/or replacements."/>
       </c:changes>
     </c:release>
   </c:releases>
