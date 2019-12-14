@@ -3,7 +3,7 @@
 <div xmlns="http://www.w3.org/1999/xhtml">
   <ul>
     <li>GitHub support</li>
-    <li>Written in pure Java 9</li>
+    <li>Written in pure Java 11</li>
     <li>ISC license</li>
   </ul>
 </div>
