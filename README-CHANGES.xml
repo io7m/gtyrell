@@ -1,63 +1,55 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<c:changelog xmlns:c="http://schemas.io7m.com/changelog/2.0.0">
-  <c:project>io7m-gtyrell</c:project>
-
-  <c:release c:ticket-system="com.github.io7m.gtyrell">
-    <c:date>2017-02-22</c:date>
-    <c:version>1.0.0</c:version>
-    <c:item>
-      <c:date>2017-02-22</c:date>
-      <c:type-code-fix/>
-      <c:ticket>2</c:ticket>
-      <c:summary>Mirror all repositories, not just those that the user owns.</c:summary>
-    </c:item>
-    <c:item>
-      <c:date>2017-02-22</c:date>
-      <c:type-code-fix/>
-      <c:ticket>4</c:ticket>
-      <c:summary>Parse GitHub issues before saving them, and do not save invalid JSON.</c:summary>
-    </c:item>
-    <c:item>
-      <c:date>2017-02-22</c:date>
-      <c:type-code-fix/>
-      <c:ticket>5</c:ticket>
-      <c:summary>Fail quickly when the user fails to provide authentication details for repositories that require them for cloning or updating.</c:summary>
-    </c:item>
-  </c:release>
-
-  <c:release c:ticket-system="com.github.io7m.gtyrell">
-    <c:date>2017-01-28</c:date>
-    <c:version>0.2.1</c:version>
-    <c:item>
-      <c:date>2017-01-28</c:date>
-      <c:type-code-fix/>
-      <c:ticket>3</c:ticket>
-      <c:summary>Fix shade and dependency configuration for mail alerts.</c:summary>
-    </c:item>
-  </c:release>
-
-  <c:release c:ticket-system="com.github.io7m.gtyrell">
-    <c:date>2017-01-28</c:date>
-    <c:version>0.2.0</c:version>
-    <c:item>
-      <c:date>2017-01-28</c:date>
-      <c:type-code-new/>
-      <c:ticket>1</c:ticket>
-      <c:summary>GitHub issues are now fetched and saved in a compressed JSON format.</c:summary>
-    </c:item>
-  </c:release>
-
-  <c:release c:ticket-system="com.github.io7m.gtyrell">
-    <c:date>2015-08-02</c:date>
-    <c:version>0.1.0</c:version>
-    <c:item>
-      <c:date>2015-08-02</c:date>
-      <c:type-code-new/>
-      <c:summary>Initial release.</c:summary>
-    </c:item>
-  </c:release>
-
-  <c:ticket-system xml:id="com.github.io7m.gtyrell">
-    <c:ticket-url>http://github.com/io7m/gtyrell/issues/</c:ticket-url>
-  </c:ticket-system>
+<?xml version="1.0" encoding="UTF-8"?><c:changelog xmlns:c="urn:com.io7m.changelog:4.0" project="com.io7m.gtyrell">
+  <c:releases>
+    <c:release date="2015-08-02T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="0.1.0">
+      <c:changes>
+        <c:change date="2015-08-02T00:00:00+00:00" summary="Initial release."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2017-01-28T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="0.2.0">
+      <c:changes>
+        <c:change date="2017-01-28T00:00:00+00:00" summary="GitHub issues are now fetched and saved in a compressed JSON format.">
+          <c:tickets>
+            <c:ticket id="1"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2017-01-28T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="0.2.1">
+      <c:changes>
+        <c:change date="2017-01-28T00:00:00+00:00" summary="Fix shade and dependency configuration for mail alerts.">
+          <c:tickets>
+            <c:ticket id="3"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2017-02-22T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="1.0.0">
+      <c:changes>
+        <c:change date="2017-02-22T00:00:00+00:00" summary="Mirror all repositories, not just those that the user owns.">
+          <c:tickets>
+            <c:ticket id="2"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2017-02-22T00:00:00+00:00" summary="Parse GitHub issues before saving them, and do not save invalid JSON.">
+          <c:tickets>
+            <c:ticket id="4"/>
+          </c:tickets>
+        </c:change>
+        <c:change date="2017-02-22T00:00:00+00:00" summary="Fail quickly when the user fails to provide authentication details for repositories that require them for cloning or updating.">
+          <c:tickets>
+            <c:ticket id="5"/>
+          </c:tickets>
+        </c:change>
+      </c:changes>
+    </c:release>
+    <c:release date="2018-03-25T11:40:10+00:00" ticket-system="com.github.io7m.gtyrell" version="2.0.0">
+      <c:changes>
+        <c:change compatible="false" date="2018-03-25T00:00:00+00:00" summary="Add inclusion/exclusion patterns"/>
+        <c:change compatible="false" date="2018-03-25T11:40:10+00:00" summary="Start requiring Java 11, and upgrade all dependencies to modern versions and/or replacements."/>
+      </c:changes>
+    </c:release>
+  </c:releases>
+  <c:ticket-systems>
+    <c:ticket-system default="false" id="com.github.io7m.gtyrell" url="http://github.com/io7m/gtyrell/issues/"/>
+  </c:ticket-systems>
 </c:changelog>
