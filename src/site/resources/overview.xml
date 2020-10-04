@@ -8,10 +8,6 @@
          <img src="https://img.shields.io/maven-central/v/com.io7m.gtyrell/com.io7m.gtyrell.png?style=flat-square"
               alt="Maven Central"/>
       </a>
-      <a href="https://www.codacy.com/app/github_79/gtyrell">
-         <img src="https://img.shields.io/codacy/grade/1a59ea6bf43c4f5896a3b0195037be64.png?style=flat-square"
-              alt="Codacy"/>
-      </a>
       <a href="https://codecov.io/gh/io7m/gtyrell">
          <img src="https://img.shields.io/codecov/c/github/io7m/gtyrell.png?style=flat-square"
               alt="Codecov"/>
