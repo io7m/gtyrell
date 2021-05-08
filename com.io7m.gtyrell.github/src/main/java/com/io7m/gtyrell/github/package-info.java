@@ -14,4 +14,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Git mirroring tool (GitHub backend)
+ */
+
 package com.io7m.gtyrell.github;

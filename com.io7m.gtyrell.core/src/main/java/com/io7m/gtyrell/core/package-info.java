@@ -14,4 +14,8 @@
  * IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/**
+ * Git mirroring tool (Core)
+ */
+
 package com.io7m.gtyrell.core;
