@@ -27,6 +27,18 @@ The server will not fork into the background and can be safely used under
 a process supervision system such as [s6](http://www.skarnet.org/software/s6/)
 without issues.
 
+## Pause Durations
+
+The server executes in a loop where it will take the current time `t`, sync
+all of the repositories, and then pause until `t + d`, where `d` is the pause
+duration specified. This implies that you should configure the pause duration
+such that it is long enough for the server to actually complete repository
+syncing. If the server takes a duration `k` to complete syncing, and
+`t + k < t + d`, then the server will _immediately_ start syncing again. This
+will almost certainly annoy the administrators of the remote repositories that
+`gtyrell` is syncing. Please set `d` to a sensible value (such as 30 minutes
+or greater).
+
 ## Inclusions/Exclusion filters
 
 It's possible to explicitly include and exclude repositories from being
@@ -133,3 +145,54 @@ but rule 4 prevented that rule from being evaluated.
 
 The filter rules are inspired by [OpenBSD](https://www.openbsd.org)'s [pf](https://www.openbsd.org/faq/pf/)
 packet filter.
+
+## Metrics
+
+As of `2.1.0`, the server publishes [JMX](https://docs.oracle.com/en/java/javase/16/jmx/introduction-jmx-technology.html)
+metrics. Use the following invocation to enable JMX access on `localhost` on
+port `9999`:
+
+```
+$ java \
+  -Dcom.sun.management.jmxremote.authenticate=false \
+  -Dcom.sun.management.jmxremote.host=127.0.0.1 \
+  -Dcom.sun.management.jmxremote.local.only=true \
+  -Dcom.sun.management.jmxremote.port=9999 \
+  -Dcom.sun.management.jmxremote.ssl=false \
+  -jar com.io7m.gtyrell.server-2.1.0-main.jar server.conf
+```
+
+The JMX interface can be inspected with tools such as [visualvm](https://visualvm.github.io/),
+or can be plugged into a monitoring solution such as [prometheus](https://prometheus.io/)
+using the [Prometheus JMX Exporter](https://github.com/prometheus/jmx_exporter).
+
+The exposed metrics class is `com.io7m.gtyrell.Metrics`.
+
+|Attribute|Description|
+|---------|-----------|
+|`RepositoryCount`|The number of repositories visible to `gtyrell` right now|
+|`RepositoryGroupFailures`|The total number of times syncing a repository group failed|
+|`RepositorySyncAttemptsLatest`|The number of attempts made to sync repositories in the last sync period|
+|`RepositorySyncAttemptsTotal`|The total number of attempts made to sync repositories since `gtyrell` was started|
+|`RepositorySyncTimeNext`|The time the next sync period will start|
+|`RepositorySyncTimeSecondsLatest`|The time it took to sync all repositories in the last sync period|
+|`RepositorySyncWaitSecondsRemaining`|The number of seconds left until the next sync period|
+|`RepositorySyncsFailedLatest`|The number of failed repository sync attempts in the last sync period|
+|`RepositorySyncsFailedTotal`|The number of failed repository sync attempts since `gtyrell` was started|
+|`RepositorySyncsSucceededLatest`|The number of successful repository sync attempts in the last sync period|
+|`RepositorySyncsSucceededTotal`|The number of successful repository sync attempts since `gtyrell` was started|
+|`RepositorySyncShortPauses`|The number of times a pause duration was "too short"|
+
+The `RepositoryGroupFailures` and `RepositorySyncsFailedTotal` attributes are
+useful for monitoring purposes; they will only ever increase until `gtyrell`
+is restarted and indicate a failure to contact a remote repository or group
+of repositories.
+
+The `RepositoryCount` attribute is also useful for catching configuration issues.
+If the number is zero, then there may be some kind of misconfiguration.
+
+The `RepositorySyncShortPauses` attribute indicates that the server began
+a pause period after syncing with less than a minute to perform the pause. If
+the pause time is set to a sensible value such as 15 minutes, this attribute
+can indicate that repository syncing is taking too long, and that the sync
+is completing with very little time to spare until the next sync attempt.
