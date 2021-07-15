@@ -49,10 +49,13 @@
         <c:change compatible="false" date="2018-03-25T00:00:00+00:00" summary="Start requiring Java 11, and upgrade all dependencies to modern versions and/or replacements."/>
       </c:changes>
     </c:release>
-    <c:release date="2021-07-15T10:08:18+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="2.1.0">
+    <c:release date="2021-07-15T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="2.1.0">
       <c:changes>
         <c:change date="2021-07-11T00:00:00+00:00" summary="Add JMX metrics"/>
       </c:changes>
+    </c:release>
+    <c:release date="2021-07-15T10:09:17+00:00" is-open="true" ticket-system="com.github.io7m.gtyrell" version="2.2.0">
+      <c:changes/>
     </c:release>
   </c:releases>
   <c:ticket-systems>
