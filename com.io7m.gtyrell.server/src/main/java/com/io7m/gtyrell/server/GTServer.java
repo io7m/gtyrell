@@ -25,14 +25,24 @@ import io.vavr.collection.SortedMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
+import javax.management.ObjectName;
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneOffset;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+import static java.time.temporal.ChronoUnit.SECONDS;
 
 /**
  * A server that mirrors a set of repository groups into a directory.
@@ -47,9 +57,12 @@ public final class GTServer implements GTServerType
   }
 
   private final AtomicBoolean done;
-  private final Timer timer;
   private final AtomicBoolean started;
   private final GTServerConfiguration config;
+  private final GTServerMetricsBean metrics;
+  private final ExecutorService executor;
+  private volatile Instant timeSyncStart;
+  private volatile Instant timeSyncNext;
 
   private GTServer(
     final GTServerConfiguration in_config)
@@ -57,7 +70,19 @@ public final class GTServer implements GTServerType
     this.config = Objects.requireNonNull(in_config, "Config");
     this.done = new AtomicBoolean(false);
     this.started = new AtomicBoolean(false);
-    this.timer = new Timer();
+    this.metrics = new GTServerMetricsBean();
+    this.executor = Executors.newSingleThreadExecutor(r -> {
+      final var thread = new Thread(r);
+      thread.setName(String.format(
+        "com.io7m.gtyrell.server[%d]",
+        Long.valueOf(thread.getId()))
+      );
+      return thread;
+    });
+
+    this.timeSyncStart = Instant.now();
+    this.timeSyncNext = this.timeSyncStart.plus(this.config.pauseDuration());
+    this.updateSyncTime(this.timeSyncStart);
   }
 
   /**
@@ -89,7 +114,7 @@ public final class GTServer implements GTServerType
   {
     if (this.done.compareAndSet(false, true)) {
       LOG.debug("scheduling server shutdown");
-      this.timer.cancel();
+      this.executor.shutdown();
     }
   }
 
@@ -105,17 +130,36 @@ public final class GTServer implements GTServerType
       LOG.debug("starting server");
       LOG.info("{} start", this.version());
 
-      this.timer.scheduleAtFixedRate(
-        new TimerTask()
-        {
-          @Override
-          public void run()
-          {
-            GTServer.this.runOnce();
+      this.setupMetrics();
+
+      this.executor.execute(() -> {
+        while (!this.done.get()) {
+          try {
+            this.runOnce();
+          } catch (final Throwable e) {
+            LOG.error("crashed: ", e);
           }
-        }, 0L, this.config.pauseDuration().toMillis());
+        }
+      });
     } else {
       throw new IllegalStateException("Server is already running!");
+    }
+  }
+
+  private void setupMetrics()
+  {
+    try {
+      final var server =
+        ManagementFactory.getPlatformMBeanServer();
+      final var objectName =
+        new ObjectName("com.io7m.gtyrell:name=Metrics");
+
+      server.registerMBean(this.metrics, objectName);
+    } catch (final MalformedObjectNameException
+      | InstanceAlreadyExistsException
+      | MBeanRegistrationException
+      | NotCompliantMBeanException e) {
+      LOG.error("unable to register metrics bean: ", e);
     }
   }
 
@@ -133,10 +177,10 @@ public final class GTServer implements GTServerType
   {
     LOG.debug("running sync");
 
-    final var time_then = Instant.now();
+    this.timeSyncStart = Instant.now();
+    this.timeSyncNext = this.timeSyncStart.plus(this.config.pauseDuration());
 
-    final var producers =
-      this.config.producers();
+    final var producers = this.config.producers();
     for (var index = 0; index < producers.size(); ++index) {
       if (this.done.get()) {
         LOG.debug("stopping server");
@@ -153,6 +197,7 @@ public final class GTServer implements GTServerType
         groups = p.get(this.config.git());
         for (final var group : groups) {
           try {
+            this.metrics.repositoryCountAdd(group._2.repositories().size());
             this.syncGroup(group._2);
           } catch (final Exception e) {
             LOG.error("error syncing group: {}: ", group._1.text(), e);
@@ -160,20 +205,69 @@ public final class GTServer implements GTServerType
         }
       } catch (final Exception e) {
         LOG.error("error retrieving repository groups: ", e);
+        this.metrics.repositoryGroupSyncFailed();
       }
     }
 
-    final var time_now = Instant.now();
-    LOG.debug("sync took {}", elapsedTime(time_then, time_now));
+    this.metrics.update();
+
+    final var timeNow = Instant.now();
+    LOG.debug("sync took {}", elapsedTime(this.timeSyncStart, timeNow));
+    this.metrics.setRepositorySyncTimeSecondsLatest(this.timeSyncStart.until(timeNow, SECONDS));
     LOG.debug("sync completed, pausing");
+    this.pauseUntilNextSync();
+  }
+
+  private void pauseUntilNextSync()
+  {
+    this.checkPauseTimeIsSane();
+
+    while (true) {
+      final var timeNow = Instant.now();
+      if (timeNow.isAfter(this.timeSyncNext)) {
+        break;
+      }
+
+      this.updateSyncTime(timeNow);
+
+      try {
+        Thread.sleep(1_000L);
+      } catch (final InterruptedException e) {
+        Thread.currentThread().interrupt();
+      }
+    }
+  }
+
+  private void checkPauseTimeIsSane()
+  {
+    final var timeNow = 
+      Instant.now();
+    final var pauseTime = 
+      Duration.between(timeNow, this.timeSyncNext);
+
+    if (pauseTime.toSeconds() < 60L) {
+      LOG.warn("very little time left for pausing; pause duration may be too short for this workload");
+      this.metrics.repositoryShortPause();
+    }
+  }
+
+  private void updateSyncTime(
+    final Instant timeNow)
+  {
+    this.metrics.setRepositorySyncWaitSecondsRemaining(
+      Duration.between(timeNow, this.timeSyncNext).toSeconds()
+    );
+    this.metrics.setRepositorySyncTimeNext(
+      this.timeSyncNext.atOffset(ZoneOffset.UTC)
+        .format(ISO_OFFSET_DATE_TIME)
+    );
   }
 
   private static String elapsedTime(
     final Instant time_then,
     final Instant time_now)
   {
-    final var elapsed = time_then.until(time_now, ChronoUnit.SECONDS);
-
+    final var elapsed = time_then.until(time_now, SECONDS);
     final var seconds = Math.toIntExact(elapsed % 60L);
     final var new_elapsed = Math.toIntExact(elapsed / 60L);
     final var minutes = new_elapsed % 60;
@@ -193,6 +287,8 @@ public final class GTServer implements GTServerType
 
     final Map<GTRepositoryName, GTRepositoryType> repositories = g.repositories();
     for (final var name : repositories.keySet()) {
+      this.metrics.repositorySyncAttempted();
+
       if (this.done.get()) {
         LOG.debug("stopping server");
         return;
@@ -212,8 +308,10 @@ public final class GTServer implements GTServerType
         } else {
           LOG.debug("not syncing due to dry run");
         }
+        this.metrics.repositorySyncSucceeded();
       } catch (final IOException e) {
         LOG.error("error syncing {}: ", repos, e);
+        this.metrics.repositorySyncFailed();
       }
     }
   }

@@ -54,7 +54,7 @@ public final class GTServerConfigurations
   /**
    * Load a server configuration from the given properties.
    *
-   * @param p The properties
+   * @param p         The properties
    * @param compilers A provider of compilers for filter rules
    *
    * @return A new server configuration
@@ -86,7 +86,7 @@ public final class GTServerConfigurations
     }
 
     final var dry_run =
-      JProperties.getBooleanOptional(
+      JProperties.getBooleanWithDefault(
         p, "com.io7m.gtyrell.server.dry_run", false);
 
     return GTServerConfiguration.of(root, sources, git, pause, dry_run);
@@ -123,7 +123,9 @@ public final class GTServerConfigurations
 
       final GTFilterProgram filter;
       try (var stream = Files.newInputStream(Paths.get(filter_file))) {
-        final var compiler = compilers.createFor(URI.create(filter_file), stream);
+        final var compiler = compilers.createFor(
+          URI.create(filter_file),
+          stream);
         filter = compiler.compile();
       }
 
@@ -172,12 +174,14 @@ public final class GTServerConfigurations
 
       if (total.getSeconds() < 1L) {
         throw new JPropertyIncorrectType(
-          "com.io7m.gtyrell.server.pause_duration: Duration is too small (must be at least 1 second)");
+          "com.io7m.gtyrell.server.pause_duration: Duration is too small (must be at least 1 second)",
+          new IllegalArgumentException());
       }
       return total;
     }
 
     throw new JPropertyIncorrectType(
-      "com.io7m.gtyrell.server.pause_duration: Expected a duration of the form: " + pattern.pattern());
+      "com.io7m.gtyrell.server.pause_duration: Expected a duration of the form: " + pattern.pattern(),
+      new IllegalArgumentException());
   }
 }

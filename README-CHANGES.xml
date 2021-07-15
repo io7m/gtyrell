@@ -1,11 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><c:changelog xmlns:c="urn:com.io7m.changelog:4.0" project="com.io7m.gtyrell">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<c:changelog project="com.io7m.gtyrell" xmlns:c="urn:com.io7m.changelog:4.0">
   <c:releases>
-    <c:release date="2015-08-02T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="0.1.0">
+    <c:release date="2015-08-02T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="0.1.0">
       <c:changes>
         <c:change date="2015-08-02T00:00:00+00:00" summary="Initial release."/>
       </c:changes>
     </c:release>
-    <c:release date="2017-01-28T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="0.2.0">
+    <c:release date="2017-01-28T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="0.2.0">
       <c:changes>
         <c:change date="2017-01-28T00:00:00+00:00" summary="GitHub issues are now fetched and saved in a compressed JSON format.">
           <c:tickets>
@@ -14,7 +15,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2017-01-28T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="0.2.1">
+    <c:release date="2017-01-28T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="0.2.1">
       <c:changes>
         <c:change date="2017-01-28T00:00:00+00:00" summary="Fix shade and dependency configuration for mail alerts.">
           <c:tickets>
@@ -23,7 +24,7 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2017-02-22T00:00:00+00:00" ticket-system="com.github.io7m.gtyrell" version="1.0.0">
+    <c:release date="2017-02-22T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="1.0.0">
       <c:changes>
         <c:change date="2017-02-22T00:00:00+00:00" summary="Mirror all repositories, not just those that the user owns.">
           <c:tickets>
@@ -42,10 +43,15 @@
         </c:change>
       </c:changes>
     </c:release>
-    <c:release date="2018-03-25T11:40:10+00:00" ticket-system="com.github.io7m.gtyrell" version="2.0.0">
+    <c:release date="2018-03-25T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="2.0.0">
       <c:changes>
         <c:change compatible="false" date="2018-03-25T00:00:00+00:00" summary="Add inclusion/exclusion patterns"/>
-        <c:change compatible="false" date="2018-03-25T11:40:10+00:00" summary="Start requiring Java 11, and upgrade all dependencies to modern versions and/or replacements."/>
+        <c:change compatible="false" date="2018-03-25T00:00:00+00:00" summary="Start requiring Java 11, and upgrade all dependencies to modern versions and/or replacements."/>
+      </c:changes>
+    </c:release>
+    <c:release date="2021-07-15T10:08:18+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="2.1.0">
+      <c:changes>
+        <c:change date="2021-07-11T00:00:00+00:00" summary="Add JMX metrics"/>
       </c:changes>
     </c:release>
   </c:releases>
