@@ -34,7 +34,7 @@ all of the repositories, and then pause until `t + d`, where `d` is the pause
 duration specified. This implies that you should configure the pause duration
 such that it is long enough for the server to actually complete repository
 syncing. If the server takes a duration `k` to complete syncing, and
-`t + k < t + d`, then the server will _immediately_ start syncing again. This
+`t + k >= t + d`, then the server will _immediately_ start syncing again. This
 will almost certainly annoy the administrators of the remote repositories that
 `gtyrell` is syncing. Please set `d` to a sensible value (such as 30 minutes
 or greater).
