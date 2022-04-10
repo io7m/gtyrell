@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>com.io7m.primogenitor</groupId>
     <artifactId>com.io7m.primogenitor.full</artifactId>
-    <version>6.4.2</version>
+    <version>7.0.0</version>
   </parent>
 
   <groupId>com.io7m.gtyrell</groupId>
   <artifactId>com.io7m.gtyrell</artifactId>
-  <version>2.1.0</version>
+  <version>3.0.0</version>
 
   <packaging>pom</packaging>
   <name>com.io7m.gtyrell</name>
   <description>Git mirroring tool</description>
-  <url>http://github.com/io7m/gtyrell</url>
+  <url>https://www.io7m.com/software/gtyrell</url>
 
   <modules>
     <module>com.io7m.gtyrell.core</module>
@@ -27,13 +30,13 @@
   </modules>
 
   <properties>
-    <io7m.api.previousVersion>2.0.0</io7m.api.previousVersion>
+    <io7m.api.previousVersion>2.1.0</io7m.api.previousVersion>
   </properties>
 
   <licenses>
     <license>
       <name>ISC License</name>
-      <url>http://io7m.com/license/isc.txt</url>
+      <url>https://www.io7m.com/license/isc.txt</url>
     </license>
   </licenses>
 
@@ -48,12 +51,12 @@
       <id>io7m</id>
       <name>Mark Raynsford</name>
       <email>code@io7m.com</email>
-      <url>http://io7m.com</url>
+      <url>https://www.io7m.com</url>
     </developer>
   </developers>
 
   <issueManagement>
-    <url>http://github.com/io7m/gtyrell/issues</url>
+    <url>https://github.com/io7m/gtyrell/issues</url>
     <system>GitHub Issues</system>
   </issueManagement>
 
@@ -83,48 +86,59 @@
       <dependency>
         <groupId>com.io7m.junreachable</groupId>
         <artifactId>com.io7m.junreachable.core</artifactId>
-        <version>3.0.0</version>
+        <version>4.0.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.jaffirm</groupId>
         <artifactId>com.io7m.jaffirm.core</artifactId>
-        <version>3.0.4</version>
+        <version>4.0.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.jproperties</groupId>
         <artifactId>com.io7m.jproperties.core</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.0</version>
       </dependency>
       <dependency>
         <groupId>com.io7m.jlexing</groupId>
         <artifactId>com.io7m.jlexing.core</artifactId>
+        <version>3.0.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.annotation.versioning</artifactId>
+        <version>1.1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.annotation.bundle</artifactId>
         <version>2.0.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.vavr</groupId>
         <artifactId>vavr</artifactId>
-        <version>1.0.0-alpha-3</version>
+        <version>1.0.0-alpha-4</version>
       </dependency>
       <dependency>
         <groupId>org.immutables</groupId>
         <artifactId>value</artifactId>
-        <version>2.8.3</version>
+        <version>2.9.0</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.0-alpha1</version>
+        <version>2.0.0-alpha7</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.3.0-alpha5</version>
+        <version>1.3.0-alpha14</version>
       </dependency>
       <dependency>
         <groupId>com.beust</groupId>
         <artifactId>jcommander</artifactId>
-        <version>1.78</version>
+        <version>1.82</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
@@ -134,7 +148,7 @@
       <dependency>
         <groupId>org.kohsuke</groupId>
         <artifactId>github-api</artifactId>
-        <version>1.131</version>
+        <version>1.303</version>
       </dependency>
       <dependency>
         <groupId>javax.mail</groupId>
@@ -144,18 +158,18 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.12.3</version>
+        <version>2.13.2</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.12.3</version>
+        <version>2.13.2.2</version>
       </dependency>
 
       <dependency>
         <groupId>com.github.marschall</groupId>
         <artifactId>memoryfilesystem</artifactId>
-        <version>2.1.0</version>
+        <version>2.3.0</version>
       </dependency>
       <dependency>
         <groupId>org.jmockit</groupId>
