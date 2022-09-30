@@ -2,7 +2,7 @@ gtyrell
 ===
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.io7m.gtyrell/com.io7m.gtyrell.svg?style=flat-square)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.io7m.gtyrell%22)
-[![Maven Central (snapshot)](https://img.shields.io/nexus/s/https/oss.sonatype.org/com.io7m.gtyrell/com.io7m.gtyrell.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/com/io7m/gtyrell/)
+[![Maven Central (snapshot)](https://img.shields.io/nexus/s/https/s01.oss.sonatype.org/com.io7m.gtyrell/com.io7m.gtyrell.svg?style=flat-square)](https://s01.oss.sonatype.org/content/repositories/snapshots/com/io7m/gtyrell/)
 [![Codecov](https://img.shields.io/codecov/c/github/io7m/gtyrell.svg?style=flat-square)](https://codecov.io/gh/io7m/gtyrell)
 
 ![gtyrell](./src/site/resources/gtyrell.jpg?raw=true)
