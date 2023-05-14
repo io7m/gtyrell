@@ -18,5 +18,6 @@ RUN ["apk", "update"]
 RUN ["apk", "add", "git"]
 
 VOLUME "/gtyrell/etc"
+VOLUME "/data"
 
 CMD ["/opt/java/openjdk/bin/java", "-jar", "/gtyrell/bin/gtyrell.jar"]
