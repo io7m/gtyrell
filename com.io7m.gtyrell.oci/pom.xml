@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.io7m.gtyrell</groupId>
+    <artifactId>com.io7m.gtyrell</artifactId>
+    <version>3.0.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>com.io7m.gtyrell.oci</artifactId>
+
+  <packaging>jar</packaging>
+  <name>com.io7m.gtyrell.oci</name>
+  <description>Git mirroring tool (OCI image)</description>
+  <url>https://www.io7m.com/software/gtyrell</url>
+
+  <properties>
+    <mdep.analyze.skip>true</mdep.analyze.skip>
+    <com.io7m.oci.versionAlpine>3.17.3</com.io7m.oci.versionAlpine>
+    <com.io7m.oci.versionTemurin>17.0.7_7-jre-alpine</com.io7m.oci.versionTemurin>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.gtyrell.core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.gtyrell.filter</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.gtyrell.server</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>com.io7m.gtyrell.github</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <id>io7m-oci-image</id>
+
+      <dependencies>
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>com.io7m.gtyrell.server</artifactId>
+          <version>${project.version}</version>
+          <classifier>main</classifier>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>distribution</id>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <finalName>gtyrell</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <descriptors>
+                    <descriptor>src/main/assembly/distribution.xml</descriptor>
+                  </descriptors>
+                  <outputDirectory>${project.build.directory}/oci</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Copy filtered container file to build directory. -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-containerfile</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/main/resources</directory>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                  <outputDirectory>${project.build.directory}/oci</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- OCI image creation and deployment. -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <!-- Build and tag an image with podman. -->
+              <execution>
+                <id>oci-image-create</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <executable>podman</executable>
+                  <arguments>
+                    <argument>build</argument>
+                    <argument>--timestamp</argument>
+                    <argument>1577836800</argument>
+                    <argument>-t</argument>
+                    <argument>quay.io/io7mcom/gtyrell:${project.version}</argument>
+                    <argument>${project.build.directory}/oci</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <!-- Push with podman. -->
+              <execution>
+                <id>oci-image-push</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <executable>podman</executable>
+                  <arguments>
+                    <argument>push</argument>
+                    <argument>quay.io/io7mcom/gtyrell:${project.version}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
