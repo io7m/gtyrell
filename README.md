@@ -15,6 +15,15 @@ gtyrell
 | OpenJDK (Temurin) LTS | Windows | [![Build (OpenJDK (Temurin) LTS, Windows)](https://img.shields.io/github/actions/workflow/status/io7m/gtyrell/main.windows.temurin.lts.yml)](https://github.com/io7m/gtyrell/actions?query=workflow%3Amain.windows.temurin.lts)|
 
 
+## Installation
+
+OCI images are available from [quay.io](https://quay.io/repository/io7mcom/gtyrell).
+
+
+```
+$ podman pull quay.io/io7mcom/gtyrell:${version}
+```
+
 ## Usage
 
 Create a server configuration file (`server.conf`):
