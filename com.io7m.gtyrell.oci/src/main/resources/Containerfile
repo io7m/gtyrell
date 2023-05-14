@@ -14,4 +14,10 @@ LABEL "org.opencontainers.image.url"="https://www.io7m.com/software/gtyrell"
 LABEL "org.opencontainers.image.version"="${project.version}"
 LABEL "org.opencontainers.image.revision"="${buildNumber}"
 
-CMD ["/opt/java/openjdk/bin/java", "-jar", "/gtyrell/bin/gtyrell.jar"]
+RUN ["apk", "update"]
+RUN ["apk", "add", "git"]
+
+VOLUME "/gtyrell/etc"
+VOLUME "/data"
+
+ENTRYPOINT ["/opt/java/openjdk/bin/java", "-jar", "/gtyrell/bin/gtyrell.jar"]

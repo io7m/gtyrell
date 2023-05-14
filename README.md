@@ -53,6 +53,22 @@ The server will not fork into the background and can be safely used under
 a process supervision system such as [s6](http://www.skarnet.org/software/s6/)
 without issues.
 
+### Credentials
+
+The server will use the system's installed `git` executable to clone
+repositories, and therefore will implicitly use the `$HOME/.git-credentials`
+data of the user running the server. It is important that the credentials
+in that file are a superset of the credentials specified in the server's
+configuration file (otherwise the server might list repositories with which
+`git` cannot interact).
+
+When running under an OCI container such as `podman`, the server executable
+will be running as `root`, and therefore a `git-credentials` file should be
+mounted in the container at `/root/.git-credentials`. It is highly recommended
+that containers be run [rootless](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md);
+the server does not require any special privileges, and does not do any
+dropping of privileges on its own.
+
 ## Pause Durations
 
 The server executes in a loop where it will take the current time `t`, sync
