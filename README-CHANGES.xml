@@ -54,9 +54,20 @@
         <c:change date="2021-07-11T00:00:00+00:00" summary="Add JMX metrics"/>
       </c:changes>
     </c:release>
-    <c:release date="2022-04-10T13:31:02+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="3.0.0">
+    <c:release date="2022-04-10T00:00:00+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="3.0.0">
       <c:changes>
         <c:change compatible="false" date="2022-04-10T00:00:00+00:00" summary="Require JDK 17"/>
+      </c:changes>
+    </c:release>
+    <c:release date="2023-05-14T19:12:08+00:00" is-open="false" ticket-system="com.github.io7m.gtyrell" version="3.1.0">
+      <c:changes>
+        <c:change date="2023-05-04T00:00:00+00:00" summary="Update org.slf4j:slf4j-api 2.0.6 → 2.0.7."/>
+        <c:change date="2023-05-04T00:00:00+00:00" summary="Update ch.qos.logback:logback-classic 1.4.5 → 1.4.7."/>
+        <c:change date="2023-05-04T00:00:00+00:00" summary="Update org.kohsuke:github-api 1.313 → 1.314."/>
+        <c:change date="2023-05-04T00:00:00+00:00" summary="Update com.fasterxml.jackson.core:jackson-core 2.14.1 → 2.15.0."/>
+        <c:change date="2023-05-04T00:00:00+00:00" summary="Update com.fasterxml.jackson.core:jackson-databind 2.14.1 → 2.15.0."/>
+        <c:change date="2023-05-04T00:00:00+00:00" summary="Update com.github.marschall:memoryfilesystem 2.4.0 → 2.5.1."/>
+        <c:change date="2023-05-14T00:00:00+00:00" summary="Add OCI images at quay.io."/>
       </c:changes>
     </c:release>
   </c:releases>

@@ -21,8 +21,8 @@ import com.io7m.gtyrell.filter.GTFilterProgram;
 import com.io7m.gtyrell.filter.GTFilterRule;
 import com.io7m.gtyrell.filter.GTFilterRuleType;
 import io.vavr.collection.List;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +42,7 @@ public final class GTFilterProgramTest
         .setRules(List.empty())
         .build();
 
-    Assert.assertFalse(program.includes(LOG, "example/x"));
+    Assertions.assertFalse(program.includes(LOG, "example/x"));
   }
 
   @Test
@@ -58,7 +58,7 @@ public final class GTFilterProgramTest
             .build()))
         .build();
 
-    Assert.assertTrue(program.includes(LOG, "example/x"));
+    Assertions.assertTrue(program.includes(LOG, "example/x"));
   }
 
   @Test
@@ -81,7 +81,7 @@ public final class GTFilterProgramTest
         )
         .build();
 
-    Assert.assertTrue(program.includes(LOG, "example/x"));
+    Assertions.assertTrue(program.includes(LOG, "example/x"));
   }
 
   @Test
@@ -104,7 +104,7 @@ public final class GTFilterProgramTest
         )
         .build();
 
-    Assert.assertFalse(program.includes(LOG, "example/x"));
+    Assertions.assertFalse(program.includes(LOG, "example/x"));
   }
 
   @Test
@@ -131,7 +131,7 @@ public final class GTFilterProgramTest
         )
         .build();
 
-    Assert.assertTrue(program.includes(LOG, "example/x"));
+    Assertions.assertTrue(program.includes(LOG, "example/x"));
   }
 
   @Test
@@ -158,6 +158,6 @@ public final class GTFilterProgramTest
         )
         .build();
 
-    Assert.assertFalse(program.includes(LOG, "example/x"));
+    Assertions.assertFalse(program.includes(LOG, "example/x"));
   }
 }

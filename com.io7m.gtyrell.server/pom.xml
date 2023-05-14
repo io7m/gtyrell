@@ -10,7 +10,7 @@
   <parent>
     <groupId>com.io7m.gtyrell</groupId>
     <artifactId>com.io7m.gtyrell</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>com.io7m.gtyrell.server</artifactId>
@@ -81,12 +81,6 @@
       <groupId>org.immutables</groupId>
       <artifactId>value</artifactId>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 

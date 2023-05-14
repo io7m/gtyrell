@@ -10,7 +10,7 @@
   <parent>
     <groupId>com.io7m.gtyrell</groupId>
     <artifactId>com.io7m.gtyrell</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>com.io7m.gtyrell.tests</artifactId>
@@ -47,9 +47,12 @@
     </dependency>
 
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
     </dependency>
   </dependencies>
 
