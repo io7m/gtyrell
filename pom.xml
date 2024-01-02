@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.io7m.primogenitor</groupId>
     <artifactId>com.io7m.primogenitor.full</artifactId>
-    <version>7.5.0</version>
+    <version>8.1.0</version>
   </parent>
 
   <groupId>com.io7m.gtyrell</groupId>
@@ -145,12 +145,12 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.11.0</version>
+        <version>2.13.0</version>
       </dependency>
       <dependency>
         <groupId>org.kohsuke</groupId>
         <artifactId>github-api</artifactId>
-        <version>1.314</version>
+        <version>1.315</version>
       </dependency>
       <dependency>
         <groupId>javax.mail</groupId>
@@ -160,12 +160,12 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.15.0</version>
+        <version>2.15.2</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.15.0</version>
+        <version>2.15.2</version>
       </dependency>
 
       <dependency>
@@ -182,7 +182,7 @@
       <dependency>
         <groupId>com.github.marschall</groupId>
         <artifactId>memoryfilesystem</artifactId>
-        <version>2.6.0</version>
+        <version>2.6.1</version>
       </dependency>
       <dependency>
         <groupId>org.jmockit</groupId>
